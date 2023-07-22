@@ -15,6 +15,7 @@ dist-ssr
 # Data
 /.dune2.env
 /data
+/public/**/*
 
 # Editor directories and files
 .vscode/*
