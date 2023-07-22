@@ -11,6 +11,7 @@
   "devDependencies": {
     "eslint": "^8.45.0",
     "typescript": "^5.0.2",
-    "vite": "^4.4.5"
+    "vite": "^4.4.5",
+    "wasm-pack": "^0.12.1"
   }
 }
