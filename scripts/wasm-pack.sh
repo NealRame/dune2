@@ -15,7 +15,8 @@ source "$SOURCES_DIR/scripts/env.sh"
 pushd "$DUNE2_RESOURCES_DIR"
     "$SOURCES_DIR/node_modules/.bin/wasm-pack" \
         build packages/dune2 \
-            --release \
             --out-dir "$SOURCES_DIR/packages/dune2-resources" \
+            --release \
+            --scope nealrame \
             -- --features wasm
 popd
