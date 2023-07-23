@@ -9,7 +9,8 @@
     "dune2-rc-wasm-pack": "./scripts/wasm-pack.sh",
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "./scripts/npm-postinstall.sh"
   },
   "devDependencies": {
     "eslint": "^8.45.0",
