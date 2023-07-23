@@ -1,17 +1,10 @@
 import {
-    type TColor,
-} from "./types"
+    padLeft,
+} from "@nealrame/utils"
 
-function padLeft(
-    str: string,
-    targetLength: number,
-    padString: string
-): string {
-    while (str.length < targetLength) {
-        str = padString + str
-    }
-    return str.slice(-targetLength)
-}
+import {
+    type TRGBAColor,
+} from "./types"
 
 function toHex(
     v: number,
@@ -19,34 +12,130 @@ function toHex(
     return padLeft(v.toString(16), 2, "0")
 }
 
-export const Black: TColor = {
-    r: 0,
-    g: 0,
-    b: 0,
-    a: 255,
-}
+export class Color implements TRGBAColor {
+    private _channels: [number, number, number, number]
 
-export const White: TColor = {
-    r: 255,
-    g: 255,
-    b: 255,
-    a: 255,
-}
+    public constructor(r: number, g: number, b: number, a = 255) {
+        this._channels = [r, g, b, a]
+    }
 
-export function cssHex(
-    color: TColor
-): string {
-    return `#${toHex(color.r)}${toHex(color.g)}${toHex(color.b)}${toHex(color.a)}`
-}
+    public get r(): number {
+        return this._channels[0]
+    }
 
-export function cssRGB(
-    color: TColor
-): string {
-    return `rgb(${color.r}, ${color.g}, ${color.b})`
-}
+    public get red(): number {
+        return this.r
+    }
 
-export function cssRGBA(
-    color: TColor
-): string {
-    return `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`
+    public set r(value: number) {
+        this._channels[0] = value
+    }
+
+    public set red(value: number) {
+        this.r = value
+    }
+
+    public get g(): number {
+        return this._channels[1]
+    }
+
+    public get green(): number {
+        return this.g
+    }
+
+    public set g(value: number) {
+        this._channels[1] = value
+    }
+
+    public set green(value: number) {
+        this.g = value
+    }
+
+    public get b(): number {
+        return this._channels[2]
+    }
+
+    public get blue(): number {
+        return this.b
+    }
+
+    public set b(value: number) {
+        this._channels[2] = value
+    }
+
+    public set blue(value: number) {
+        this.b = value
+    }
+
+    public get a(): number {
+        return this._channels[3]
+    }
+    
+    public get alpha(): number {
+        return this.a
+    }
+
+    public set a(value: number) {
+        this._channels[3] = value
+    }
+
+    public set alpha(value: number) {
+        this.a = value
+    }
+
+    public toHexString(): string {
+        return `#${toHex(this.r)}${toHex(this.g)}${toHex(this.b)}${toHex(this.a)}`
+    }
+
+    public toRGBString(): string {
+        return `rgb(${this.r}, ${this.g}, ${this.b})`
+    }
+
+    public toRGBAString(): string {
+        return `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a})`
+    }
+
+    public toArray(): [number, number, number, number] {
+        return [this.r, this.g, this.b, this.a]
+    }
+
+    public static fromColor({ r, g, b, a }: TRGBAColor): Color {
+        return new Color(r, g, b, a)
+    }
+
+    public static get black() {
+        return new Color(0, 0, 0, 255)
+    }
+
+    public static get white() {
+        return new Color(255, 255, 255, 255)
+    }
+
+    public static get transparent() {
+        return new Color(0, 0, 0, 0)
+    }
+
+    public static get red() {
+        return new Color(255, 0, 0, 255)
+    }
+
+    public static get green() {
+        return new Color(0, 255, 0, 255)
+    }
+
+    public static get blue() {
+        return new Color(0, 0, 255, 255)
+    }
+
+    public static get cyan() {
+        return new Color(0, 255, 255, 255)
+    }
+
+    public static get magenta() {
+        return new Color(255, 0, 255, 255)
+    }
+
+    public static get yellow() {
+        return new Color(0, 255, 255, 255)
+    }
 }

@@ -1,50 +1,52 @@
-import * as Color from "./color"
+import {
+    Color,
+} from "./color"
 
 import {
-    type TColor,
+    type TRGBAColor,
     type TPoint,
     type TRect,
     type TSize,
 } from "./types"
 
 export class Painter {
-    private _fillColor = Color.Black
-    private _strokeColor = Color.Black
+    private _fillColor = Color.black
+    private _strokeColor = Color.black
 
     public constructor(
         private _context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
     ) {
-        this._context.strokeStyle = Color.cssHex(this._strokeColor)
-        this._context.fillStyle = Color.cssHex(this._fillColor)
+        this._context.strokeStyle = this._strokeColor.toHexString()
+        this._context.fillStyle = this._fillColor.toHexString()
     }
 
-    public get fillColor(): TColor {
+    public get fillColor(): TRGBAColor {
         return this._fillColor
     }
 
-    public set fillColor(color: TColor) {
-        this._fillColor = color
-        this._context.fillStyle = Color.cssHex(this._fillColor)
+    public set fillColor(color: TRGBAColor) {
+        this._fillColor = Color.fromColor(color)
+        this._context.fillStyle = this._fillColor.toHexString()
     }
 
     public setFillColor(
-        color: TColor,
+        color: TRGBAColor,
     ): Painter {
         this.fillColor = color
         return this
     }
 
-    public get strokeColor(): TColor {
+    public get strokeColor(): TRGBAColor {
         return this._strokeColor
     }
 
-    public set strokeColor(color: TColor) {
-        this._strokeColor = color
-        this._context.strokeStyle = Color.cssHex(this._strokeColor)
+    public set strokeColor(color: TRGBAColor) {
+        this._strokeColor = Color.fromColor(color)
+        this._context.strokeStyle = this._strokeColor.toHexString()
     }
 
     public setStrokeColor(
-        color: TColor,
+        color: TRGBAColor,
     ): Painter {
         this.strokeColor = color
         return this
@@ -112,7 +114,7 @@ export class Painter {
     public getPixel({
         x,
         y,
-    }: TPoint): TColor {
+    }: TPoint): TRGBAColor {
         const [r, g, b, a] = this._context.getImageData(x, y, 1, 1).data
         return {
             r,
@@ -122,7 +124,7 @@ export class Painter {
         }
     }
 
-    public putPixel(point: TPoint, color: TColor): Painter {
+    public putPixel(point: TPoint, color: TRGBAColor): Painter {
         const { r, g, b, a } = color
         const imageData = this._context.getImageData(point.x, point.y, 1, 1)
         imageData.data[0] = r

@@ -1,4 +1,4 @@
-export type TColor = {
+export type TRGBAColor = {
     r: number
     g: number
     b: number

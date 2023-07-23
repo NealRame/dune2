@@ -38,7 +38,7 @@ async function createAnimation(
                 width: image.width + 4,
                 height: image.height + 4,
             })
-            .setFillColor(Color.Black)
+            .setFillColor(Color.black)
             .fillRect({
                 x: 400 - image.width/2,
                 y: 400 - image.height/2,
