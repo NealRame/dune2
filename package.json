@@ -20,6 +20,7 @@
     "wasm-pack": "^0.12.1"
   },
   "workspaces": [
-    "packages/dune2-resources/packages/dune2/pkg"
+    "packages/dune2-resources/packages/dune2/pkg",
+    "packages/scene"
   ]
 }
