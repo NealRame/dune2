@@ -4,7 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dune2-dev": "vite",
+    "dune2-rc-extract-data": "./scripts/extract-data.sh",
+    "dune2-rc-generate": "./scripts/generate-rc.sh",
+    "dune2-rc-wasm-pack": "./scripts/wasm-pack.sh",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
@@ -12,6 +15,10 @@
     "eslint": "^8.45.0",
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
+    "vite-plugin-wasm": "^3.2.2",
     "wasm-pack": "^0.12.1"
-  }
+  },
+  "workspaces": [
+    "packages/dune2-rc"
+  ]
 }
