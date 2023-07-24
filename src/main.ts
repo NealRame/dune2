@@ -1,82 +1,61 @@
 import {
-    Painter,
     Color,
+    Context,
+    Scene,
+    type ISceneState,
 } from "@nealrame/scene"
 
-import {
-    Dune2Resources,
-} from "@nealrame/dune2-rc"
 
 import "./style.css"
 
-async function createAnimation(
-    painter: Painter,
-    resources: Dune2Resources,
-) {
-    // const imageData = resources.getTile("tiles_16x16", 350, "harkonnen", 4)
-    // const imageData = resources.getTilemap(10, "harkonnen", 4)
-    const imageData = resources.getSpriteFrame("Starport", 3, "ordos", 4)
-    const image = await createImageBitmap(imageData)
+class Animation implements ISceneState {
+    private _fillColor = new Color(255, 0, 0)
+    private _incr = 4
 
-    const fillColor = {
-        r: 255,
-        g: 0,
-        b: 0,
-        a: 255,
-    }
+    constructor(
+        private _spriteFrame: ImageBitmap
+    ) {}
 
-    let animationFrameId = 0
-
-    let incr = 4
-
-    const frame = () => {
-        painter
-            .setFillColor(fillColor)
+    onTick(context: Context) {
+        if (context.key != null) {
+            console.log(context.key)
+        }
+        context.painter
+            .setFillColor(this._fillColor)
             .fillRect({
-                x: 400 - image.width/2 - 2,
-                y: 400 - image.height/2 - 2,
-                width: image.width + 4,
-                height: image.height + 4,
+                x: 400 - this._spriteFrame.width/2 - 2,
+                y: 400 - this._spriteFrame.height/2 - 2,
+                width: this._spriteFrame.width + 4,
+                height: this._spriteFrame.height + 4,
             })
             .setFillColor(Color.black)
             .fillRect({
-                x: 400 - image.width/2,
-                y: 400 - image.height/2,
-                width: image.width,
-                height: image.height,
+                x: 400 - this._spriteFrame.width/2,
+                y: 400 - this._spriteFrame.height/2,
+                width: this._spriteFrame.width,
+                height: this._spriteFrame.height,
             })
             .drawImage({
-                x: 400 - image.width/2,
-                y: 400 - image.height/2,
-            }, image)
+                x: 400 - this._spriteFrame.width/2,
+                y: 400 - this._spriteFrame.height/2,
+            }, this._spriteFrame)
 
-        if (incr > 0) {
-            if (fillColor.g + incr >= 255) {
-                fillColor.g = 255
-                fillColor.b = 255
-                incr *= -1
+        if (this._incr > 0) {
+            if (this._fillColor.g + this._incr >= 255) {
+                this._fillColor.g = 255
+                this._fillColor.b = 255
+                this._incr *= -1
             }
         } else {
-            if (fillColor.g + incr <= 0) {
-                fillColor.g = 0
-                fillColor.b = 0
-                incr *= -1
+            if (this._fillColor.g + this._incr <= 0) {
+                this._fillColor.g = 0
+                this._fillColor.b = 0
+                this._incr *= -1
             }
         }
 
-        fillColor.g += incr
-        fillColor.b += incr
-
-        animationFrameId = window.requestAnimationFrame(frame)
-    }
-
-    return {
-        start() {
-            window.requestAnimationFrame(frame)
-        },
-        stop() {
-            window.cancelAnimationFrame(animationFrameId)
-        }
+        this._fillColor.g += this._incr
+        this._fillColor.b += this._incr
     }
 }
 
@@ -86,14 +65,19 @@ async function createAnimation(
     const buffer = await res.arrayBuffer()
 
     const resources = Dune2Resources.load(new Uint8Array(buffer))
-    const canvas = document.querySelector("#canvas") as HTMLCanvasElement
 
-    canvas.width = 600
-    canvas.height = 600
+    const imageData = resources.getSpriteFrame("Starport", 3, "ordos", 4)
+    const image = await createImageBitmap(imageData)
 
-    const animation = await createAnimation(
-        new Painter(canvas.getContext("2d") as CanvasRenderingContext2D),
-        resources
+    const context = new Context(
+        document.querySelector("#canvas") as HTMLCanvasElement,
+        {
+            width: 600,
+            height: 600,
+        }
     )
-    animation.start()
+    const animation = new Animation(image)
+    const scene = new Scene(context, animation)
+
+    scene.start()
 })()
