@@ -1,6 +1,7 @@
 import {
     Color,
     Context,
+    Events,
     Scene,
     type ISceneState,
 } from "@nealrame/scene"
@@ -17,27 +18,42 @@ class Animation implements ISceneState {
     ) {}
 
     onTick(context: Context) {
-        if (context.key != null) {
-            console.log(context.key)
+        const centerX = context.width/2
+        const centerY = context.height/2
+
+        for (const event of context.events()) {
+            if (Events.isKeyUpEvent(event)) {
+                console.log(event.key)
+            }
+            if (Events.isMouseButtonDownEvent(event)) {
+                console.log("mouse down")
+            }
+            if (Events.isMouseButtonUpEvent(event)) {
+                console.log("mouse up")
+            }
+            if (Events.isMouseWheelEvent(event)) {
+                console.log(event.deltaX, event.deltaY)
+            }
         }
+
         context.painter
             .setFillColor(this._fillColor)
             .fillRect({
-                x: 400 - this._spriteFrame.width/2 - 2,
-                y: 400 - this._spriteFrame.height/2 - 2,
+                x: centerX - this._spriteFrame.width/2 - 2,
+                y: centerY - this._spriteFrame.height/2 - 2,
                 width: this._spriteFrame.width + 4,
                 height: this._spriteFrame.height + 4,
             })
             .setFillColor(Color.black)
             .fillRect({
-                x: 400 - this._spriteFrame.width/2,
-                y: 400 - this._spriteFrame.height/2,
+                x: centerX - this._spriteFrame.width/2,
+                y: centerY - this._spriteFrame.height/2,
                 width: this._spriteFrame.width,
                 height: this._spriteFrame.height,
             })
             .drawImage({
-                x: 400 - this._spriteFrame.width/2,
-                y: 400 - this._spriteFrame.height/2,
+                x: centerX - this._spriteFrame.width/2,
+                y: centerY - this._spriteFrame.height/2,
             }, this._spriteFrame)
 
         if (this._incr > 0) {

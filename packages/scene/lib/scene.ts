@@ -13,6 +13,7 @@ export class Scene {
     private _tick = () => {
         if (this._running) {
             this._state.onTick(this._context)
+            this._context.clear()
             this._animationFrameId = requestAnimationFrame(this._tick)
         }
     }

@@ -1,3 +1,8 @@
+import * as Events from "./events"
+import type {
+    TEvent,
+} from "./events"
+
 import type {
     TPoint,
     TSize,
@@ -8,22 +13,44 @@ import {
 } from './painter'
 
 export class Context {
-    private _painter: Painter
     private _context: CanvasRenderingContext2D
+
+    private _events: TEvent[] = []
+
     private _key: string | null = null
     private _mouse: TPoint | null = null
     private _mouseButtonDown: boolean = false
 
+    private _painter: Painter
+
+    private _onKeyDown = (event: KeyboardEvent) => {
+        this._key = event.key
+        this._events.push({
+            type: Events.KeyDown,
+            key: event.key,
+        } as TEvent)
+    }
+
     private _onKeyUp = (event: KeyboardEvent) => {
         this._key = event.key
+        this._events.push({
+            type: Events.KeyUp,
+            key: event.key,
+        } as TEvent)
     }
 
     private _onMouseDown = () => {
         this._mouseButtonDown = true
+        this._events.push({
+            type: Events.MouseButtonDown,
+        } as TEvent)
     }
 
     private _onMouseUp = () => {
         this._mouseButtonDown = false
+        this._events.push({
+            type: Events.MouseButtonUp,
+        } as TEvent)
     }
 
     private _onMouseMove = (event: MouseEvent) => {
@@ -33,27 +60,58 @@ export class Context {
         }
     }
 
+    private _onMouseWheel = (event: WheelEvent) => {
+        this._events.push({
+            type: Events.MouseWheel,
+            deltaX: event.deltaX,
+            deltaY: event.deltaY,
+        } as TEvent)
+    }
+
+
     public constructor(
         private _canvas: HTMLCanvasElement,
         size: TSize,
     ) {
-        this._context = _canvas.getContext('2d') as CanvasRenderingContext2D
+        this._context = _canvas.getContext("2d") as CanvasRenderingContext2D
         this._painter = new Painter(this._context)
         this.size = size
     }
 
+    public *events() {
+        yield* this._events
+    }
+
     public bind() {
-        this._canvas.addEventListener('mousedown', this._onMouseDown)
-        this._canvas.addEventListener('mouseup', this._onMouseUp)
-        this._canvas.addEventListener('mousemove', this._onMouseMove)
-        window.addEventListener('keyup', this._onKeyUp)
+        this._canvas.addEventListener("mousedown", this._onMouseDown)
+        this._canvas.addEventListener("mouseup", this._onMouseUp)
+        this._canvas.addEventListener("mousemove", this._onMouseMove)
+        this._canvas.addEventListener("wheel", this._onMouseWheel)
+        window.addEventListener("keydown", this._onKeyDown)
+        window.addEventListener("keyup", this._onKeyUp)
     }
 
     public unbind() {
-        this._canvas.removeEventListener('mousedown', this._onMouseDown)
-        this._canvas.removeEventListener('mouseup', this._onMouseUp)
+        this._canvas.removeEventListener("mousedown", this._onMouseDown)
+        this._canvas.removeEventListener("mouseup", this._onMouseUp)
         this._canvas.removeEventListener('mousemove', this._onMouseMove)
-        window.removeEventListener('keyup', this._onKeyUp)
+        this._canvas.removeEventListener("wheel", this._onMouseWheel)
+        window.removeEventListener("keydown", this._onKeyDown)
+        window.removeEventListener("keyup", this._onKeyUp)
+    }
+
+    public clearKey() {
+        this._key = null
+    }
+
+    public clearMouse() {
+        this._mouse = null
+    }
+
+    public clear() {
+        this.clearKey()
+        this.clearMouse()
+        this._events.splice(0)
     }
 
     public get size(): TSize {
