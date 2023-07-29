@@ -10,12 +10,22 @@ export const MouseButtonUp = 8 as const
 export const MouseMotion = 16 as const
 export const MouseWheel = 32 as const
 
+export const All = 0
+    | KeyUp
+    | KeyDown
+    | MouseButtonDown
+    | MouseButtonUp
+    | MouseMotion
+    | MouseWheel
+
 export type TEventType = typeof KeyUp
     | typeof KeyDown
     | typeof MouseButtonDown
     | typeof MouseButtonUp
     | typeof MouseMotion
     | typeof MouseWheel
+
+export type TEventFilter = (eventType: TEventType) => boolean
 
 export type TEvent = {
     type: TEventType

@@ -68,7 +68,6 @@ export class Context {
         } as TEvent)
     }
 
-
     public constructor(
         private _canvas: HTMLCanvasElement,
         size: TSize,
@@ -78,8 +77,12 @@ export class Context {
         this.size = size
     }
 
-    public *events() {
-        yield* this._events
+    public *events(filter: Events.TEventFilter = () => true) {
+        for (const event of this._events) {
+            if (filter(event.type)) {
+                yield event
+            }
+        }
     }
 
     public bind() {
