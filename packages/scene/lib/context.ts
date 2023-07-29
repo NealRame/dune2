@@ -15,7 +15,7 @@ import {
 export class Context {
     private _context: CanvasRenderingContext2D
 
-    private _events: TEvent[] = []
+    private _eventQueue: TEvent[] = []
 
     private _key: string | null = null
     private _mouse: TPoint | null = null
@@ -25,7 +25,7 @@ export class Context {
 
     private _onKeyDown = (event: KeyboardEvent) => {
         this._key = event.key
-        this._events.push({
+        this._eventQueue.push({
             type: Events.KeyDown,
             key: event.key,
         } as TEvent)
@@ -33,7 +33,7 @@ export class Context {
 
     private _onKeyUp = (event: KeyboardEvent) => {
         this._key = event.key
-        this._events.push({
+        this._eventQueue.push({
             type: Events.KeyUp,
             key: event.key,
         } as TEvent)
@@ -41,14 +41,14 @@ export class Context {
 
     private _onMouseDown = () => {
         this._mouseButtonDown = true
-        this._events.push({
+        this._eventQueue.push({
             type: Events.MouseButtonDown,
         } as TEvent)
     }
 
     private _onMouseUp = () => {
         this._mouseButtonDown = false
-        this._events.push({
+        this._eventQueue.push({
             type: Events.MouseButtonUp,
         } as TEvent)
     }
@@ -61,7 +61,7 @@ export class Context {
     }
 
     private _onMouseWheel = (event: WheelEvent) => {
-        this._events.push({
+        this._eventQueue.push({
             type: Events.MouseWheel,
             deltaX: event.deltaX,
             deltaY: event.deltaY,
@@ -78,7 +78,7 @@ export class Context {
     }
 
     public *events(filter: Events.TEventFilter = () => true) {
-        for (const event of this._events) {
+        for (const event of this._eventQueue) {
             if (filter(event.type)) {
                 yield event
             }
@@ -114,7 +114,7 @@ export class Context {
     public clear() {
         this.clearKey()
         this.clearMouse()
-        this._events.splice(0)
+        this._eventQueue.splice(0)
     }
 
     public get size(): TSize {
