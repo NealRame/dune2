@@ -13,6 +13,7 @@ import {
 } from './painter'
 
 export class Context {
+    private _canvas: HTMLCanvasElement
     private _context: CanvasRenderingContext2D
 
     private _eventQueue: TEvent[] = []
@@ -69,10 +70,11 @@ export class Context {
     }
 
     public constructor(
-        private _canvas: HTMLCanvasElement,
+        canvas: HTMLCanvasElement,
         size: TSize,
     ) {
-        this._context = _canvas.getContext("2d") as CanvasRenderingContext2D
+        this._canvas = canvas
+        this._context = canvas.getContext("2d") as CanvasRenderingContext2D
         this._painter = new Painter(this._context)
         this.size = size
     }
