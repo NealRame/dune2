@@ -17,6 +17,7 @@ export class Context {
     private _context: CanvasRenderingContext2D
 
     private _eventQueue: TEvent[] = []
+    private _eventsAccepted: number
 
     private _key: string | null = null
     private _mouse: TPoint | null = null
@@ -72,11 +73,13 @@ export class Context {
     public constructor(
         canvas: HTMLCanvasElement,
         size: TSize,
+        eventsAccepted: number = Events.All,
     ) {
         this._canvas = canvas
         this._context = canvas.getContext("2d") as CanvasRenderingContext2D
         this._painter = new Painter(this._context)
         this.size = size
+        this._eventsAccepted = eventsAccepted
     }
 
     public *events(filter: Events.TEventFilter = () => true) {
@@ -88,12 +91,24 @@ export class Context {
     }
 
     public bind() {
-        this._canvas.addEventListener("mousedown", this._onMouseDown)
-        this._canvas.addEventListener("mouseup", this._onMouseUp)
-        this._canvas.addEventListener("mousemove", this._onMouseMove)
-        this._canvas.addEventListener("wheel", this._onMouseWheel)
-        window.addEventListener("keydown", this._onKeyDown)
-        window.addEventListener("keyup", this._onKeyUp)
+        if (this._eventsAccepted & Events.MouseButtonDown) {
+            this._canvas.addEventListener("mousedown", this._onMouseDown)
+        }
+        if (this._eventsAccepted & Events.MouseButtonUp) {
+            this._canvas.addEventListener("mouseup", this._onMouseUp)
+        }
+        if (this._eventsAccepted & Events.MouseMotion) {
+            this._canvas.addEventListener("mousemove", this._onMouseMove)
+        }
+        if (this._eventsAccepted & Events.MouseWheel) {
+            this._canvas.addEventListener("wheel", this._onMouseWheel)
+        }
+        if (this._eventsAccepted & Events.KeyDown) {
+            window.addEventListener("keydown", this._onKeyDown)
+        }
+        if (this._eventsAccepted & Events.KeyUp) {
+            window.addEventListener("keyup", this._onKeyUp)
+        }
     }
 
     public unbind() {
