@@ -1,7 +1,6 @@
 import {
     Color,
     Context,
-    ContextBuilder,
     Events,
     Scene,
     type ISceneState,
@@ -85,10 +84,13 @@ class Animation implements ISceneState {
     const imageData = resources.getSpriteFrame("Starport", 3, "ordos", 4)
     const image = await createImageBitmap(imageData)
 
-    const context =
-        (new ContextBuilder())
-            .withSize(400, 400)
-            .build("#canvas")
+    const context = new Context({
+        canvas: "#canvas",
+        size: {
+            width: 400,
+            height: 400,
+        },
+    })
 
     const animation = new Animation(image)
     const scene = new Scene(context, animation)

@@ -10,14 +10,16 @@ import {
 } from "./types"
 
 export class Painter {
-    private _fillColor = Color.black
-    private _strokeColor = Color.black
+    private _context: CanvasRenderingContext2D
+    private _fillColor!: Color
+    private _strokeColor!: Color
 
     public constructor(
-        private _context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
+        canvas: HTMLCanvasElement,
     ) {
-        this._context.strokeStyle = this._strokeColor.toHexString()
-        this._context.fillStyle = this._fillColor.toHexString()
+        this._context = canvas.getContext("2d") as CanvasRenderingContext2D
+        this.strokeColor = Color.black
+        this.fillColor = Color.black
     }
 
     public get fillColor(): TRGBAColor {

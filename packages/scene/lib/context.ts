@@ -12,9 +12,14 @@ import {
     Painter,
 } from './painter'
 
+export type TContextOptions = {
+    canvas: HTMLCanvasElement | string,
+    eventsAccepted?: number,
+    size?: TSize,
+}
+
 export class Context {
     private _canvas: HTMLCanvasElement
-    private _context: CanvasRenderingContext2D
 
     private _eventQueue: TEvent[] = []
     private _eventsAccepted: number
@@ -76,16 +81,31 @@ export class Context {
         } as TEvent)
     }
 
-    public constructor(
-        canvas: HTMLCanvasElement,
-        size: TSize,
-        eventsAccepted: number,
-    ) {
-        this._canvas = canvas
-        this._context = canvas.getContext("2d") as CanvasRenderingContext2D
-        this._painter = new Painter(this._context)
-        this.size = size
-        this._eventsAccepted = eventsAccepted
+    public constructor(options: TContextOptions) {
+        if (typeof options.canvas === "string") {
+            const queryString = options.canvas
+            const element = document.querySelector(queryString)
+            if (!element) {
+                throw new Error(
+                    `Element not found for query string '${queryString}'`
+                )
+            }
+            if (!(element instanceof HTMLCanvasElement)) {
+                throw new Error(
+                    `Element for query string '${queryString}' is not a canvas`
+                )
+            }
+            this._canvas = element
+        } else {
+            this._canvas = options.canvas
+        }
+
+        this._eventsAccepted = options.eventsAccepted ?? Events.All
+        this._painter = new Painter(this._canvas)
+        this.size = options.size ?? {
+            width: this._canvas.width,
+            height: this._canvas.height,
+        }
     }
 
     public *events(filter: Events.TEventFilter = () => true) {
