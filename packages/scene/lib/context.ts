@@ -79,7 +79,7 @@ export class Context {
     public constructor(
         canvas: HTMLCanvasElement,
         size: TSize,
-        eventsAccepted: number = Events.All,
+        eventsAccepted: number,
     ) {
         this._canvas = canvas
         this._context = canvas.getContext("2d") as CanvasRenderingContext2D
