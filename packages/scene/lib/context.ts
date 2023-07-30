@@ -26,6 +26,7 @@ export class Context {
     private _painter: Painter
 
     private _onKeyDown = (event: KeyboardEvent) => {
+        event.preventDefault()
         this._key = event.key
         this._eventQueue.push({
             type: Events.KeyDown,
@@ -34,6 +35,7 @@ export class Context {
     }
 
     private _onKeyUp = (event: KeyboardEvent) => {
+        event.preventDefault()
         this._key = event.key
         this._eventQueue.push({
             type: Events.KeyUp,
@@ -41,14 +43,16 @@ export class Context {
         } as TEvent)
     }
 
-    private _onMouseDown = () => {
+    private _onMouseDown = (event: MouseEvent) => {
+        event.preventDefault()
         this._mouseButtonDown = true
         this._eventQueue.push({
             type: Events.MouseButtonDown,
         } as TEvent)
     }
 
-    private _onMouseUp = () => {
+    private _onMouseUp = (event: MouseEvent) => {
+        event.preventDefault()
         this._mouseButtonDown = false
         this._eventQueue.push({
             type: Events.MouseButtonUp,
@@ -56,6 +60,7 @@ export class Context {
     }
 
     private _onMouseMove = (event: MouseEvent) => {
+        event.preventDefault()
         this._mouse = {
             x: event.offsetX,
             y: event.offsetY,
@@ -63,6 +68,7 @@ export class Context {
     }
 
     private _onMouseWheel = (event: WheelEvent) => {
+        event.preventDefault()
         this._eventQueue.push({
             type: Events.MouseWheel,
             deltaX: event.deltaX,
