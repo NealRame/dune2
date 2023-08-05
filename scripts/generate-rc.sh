@@ -8,6 +8,7 @@ set -o pipefail
 set -u
 
 export SOURCES_DIR="${SOURCES_DIR:-$PWD}"
+export 
 
 source "$SOURCES_DIR/scripts/env.sh"
 
@@ -22,5 +23,5 @@ pushd "$DUNE2_DATA_DIR"
     "$DUNE2_RC_TOOLKIT" \
         create "$DUNE2_RESOURCES_DIR/dune2.rc.toml" \
             --force-overwrite \
-            --output-file "$SOURCES_DIR/public/dune2.rc"
+            --output-file "$SOURCES_DIR/src/dune2.rc"
 popd

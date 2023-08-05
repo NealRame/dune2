@@ -8,6 +8,8 @@ import {
 
 import "./style.css"
 
+import Dune2DataUrl from "./dune2.rc"
+
 class Animation implements ISceneState {
     private _fillColor = new Color(255, 0, 0)
     private _incr = 4
@@ -74,14 +76,17 @@ class Animation implements ISceneState {
     }
 }
 
-(async () => {
+async function fetchDune2Resources() {
+    const res = await fetch(Dune2DataUrl)
+    const data = await res.arrayBuffer()
     const { Dune2Resources } = await import("@nealrame/dune2-rc")
-    const res = await fetch("/dune2.rc")
-    const buffer = await res.arrayBuffer()
+    return Dune2Resources.load(new Uint8Array(data))
+}
 
-    const resources = Dune2Resources.load(new Uint8Array(buffer))
+;(async () => {
+    const dune2Resources = await fetchDune2Resources()
 
-    const imageData = resources.getSpriteFrame("Starport", 3, "ordos", 4)
+    const imageData = dune2Resources.getSpriteFrame("Starport", 3, "ordos", 4)
     const image = await createImageBitmap(imageData)
 
     const context = new Context({
