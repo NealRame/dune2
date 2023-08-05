@@ -3,9 +3,9 @@
         Dune2Resources,
     } from "@nealrame/dune2-rc"
 
-    import Load from "./components/Load.svelte"
     import Game from "./components/Game.svelte"
     import Home from "./components/Home.svelte"
+    import Load from "./components/Load.svelte"
 
     import Dune2DataUrl from "./dune2.rc"
 
