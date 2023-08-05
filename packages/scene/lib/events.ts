@@ -1,5 +1,6 @@
 import {
     type TPoint,
+    type TSize,
 } from "./types"
 
 export const KeyUp = 1 as const
@@ -9,6 +10,7 @@ export const MouseButtonDown = 4 as const
 export const MouseButtonUp = 8 as const
 export const MouseMotion = 16 as const
 export const MouseWheel = 32 as const
+export const Resize = 64 as const
 
 export const All = 0
     | KeyUp
@@ -17,6 +19,7 @@ export const All = 0
     | MouseButtonUp
     | MouseMotion
     | MouseWheel
+    | Resize
 
 export type TEventType = typeof KeyUp
     | typeof KeyDown
@@ -24,6 +27,7 @@ export type TEventType = typeof KeyUp
     | typeof MouseButtonUp
     | typeof MouseMotion
     | typeof MouseWheel
+    | typeof Resize
 
 export type TEventFilter = (eventType: TEventType) => boolean
 
@@ -88,4 +92,14 @@ export function isMouseWheelEvent(
     event: TEvent,
 ): event is TMouseWheelEvent {
     return event.type === MouseWheel
+}
+
+export type TResizeEvent = TEvent & {
+    type: typeof Resize
+    size: TSize
+}
+export function isResizeEvent(
+    event: TEvent,
+): event is TResizeEvent {
+    return event.type === Resize
 }

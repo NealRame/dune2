@@ -15,19 +15,31 @@
         type ISceneState,
     } from "@nealrame/scene"
 
-
     class Animation implements ISceneState {
         private _fillColor = new Color(255, 0, 0)
         private _incr = 4
-    
-        constructor(
+        private _resize = false
+
+        public constructor(
             private _spriteFrame: ImageBitmap
         ) {}
-    
-        onTick(context: Context) {
+
+        public onResize() {
+            this._resize = true
+        }
+
+        public onTick(context: Context) {
+            if (this._resize) {
+                this._resize = false
+                context.size = {
+                    width: window.innerWidth,
+                    height: window.innerHeight,
+                }
+            }
+
             const centerX = context.width/2
             const centerY = context.height/2
-    
+
             for (const event of context.events()) {
                 if (Events.isKeyUpEvent(event)) {
                     console.log(event.key)
@@ -83,25 +95,46 @@
     }
 
     export let resources: Dune2Resources
+
     let canvas!: HTMLCanvasElement
 
     onMount(() => {
         let scene: Scene|null = null
+        let state: Animation|null = null
+        const context = new Context({
+            canvas,
+            size: {
+                width: window.innerWidth,
+                height: window.innerHeight,
+            },
+        })
+        const onResize = () => {
+            state?.onResize()
+        }
 
         const imageData = resources.getSpriteFrame("Starport", 3, "ordos", 4)
         createImageBitmap(imageData).then(image => {
-            scene = new Scene(new Context({
-                canvas,
-                size: {
-                    width: 400,
-                    height: 400,
-                },
-            }), new Animation(image))
+            state = new Animation(image)
+            scene = new Scene(context, state)
             scene.start()
         })
 
-        return () => scene?.stop()
+        window.addEventListener("resize", onResize)
+        return () => {
+            scene?.stop()
+            window.removeEventListener("resize", onResize)
+        }
     })
 </script>
 
 <canvas bind:this={canvas} />
+
+<style>
+    canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+</style>

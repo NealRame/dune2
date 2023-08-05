@@ -13,7 +13,7 @@ import {
 } from './painter'
 
 export type TContextOptions = {
-    canvas: HTMLCanvasElement | string,
+    canvas: HTMLCanvasElement,
     eventsAccepted?: number,
     size?: TSize,
 }
@@ -82,24 +82,7 @@ export class Context {
     }
 
     public constructor(options: TContextOptions) {
-        if (typeof options.canvas === "string") {
-            const queryString = options.canvas
-            const element = document.querySelector(queryString)
-            if (!element) {
-                throw new Error(
-                    `Element not found for query string '${queryString}'`
-                )
-            }
-            if (!(element instanceof HTMLCanvasElement)) {
-                throw new Error(
-                    `Element for query string '${queryString}' is not a canvas`
-                )
-            }
-            this._canvas = element
-        } else {
-            this._canvas = options.canvas
-        }
-
+        this._canvas = options.canvas
         this._eventsAccepted = options.eventsAccepted ?? Events.All
         this._painter = new Painter(this._canvas)
         this.size = options.size ?? {
@@ -169,9 +152,13 @@ export class Context {
         }
     }
 
-    public set size(value: TSize) {
-        this._canvas.width = value.width
-        this._canvas.height = value.height
+    public set size(size: TSize) {
+        this._canvas.width = size.width
+        this._canvas.height = size.height
+        this._eventQueue.push({
+            type: Events.Resize,
+            size,
+        } as TEvent)
     }
 
     public get width(): number {
