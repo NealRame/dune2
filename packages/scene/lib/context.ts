@@ -127,7 +127,9 @@ export class Context {
             this._canvas.addEventListener("mousemove", this._onMouseMove)
         }
         if (this._eventsAccepted & Events.MouseWheel) {
-            this._canvas.addEventListener("wheel", this._onMouseWheel)
+            this._canvas.addEventListener("wheel", this._onMouseWheel, {
+                passive: false
+            })
         }
         if (this._eventsAccepted & Events.KeyDown) {
             window.addEventListener("keydown", this._onKeyDown)
