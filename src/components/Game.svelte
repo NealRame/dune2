@@ -13,7 +13,7 @@
         Events,
         Scene,
         type ISceneState,
-    } from "@nealrame/scene"
+    } from "@nealrame/engine"
 
     class Animation implements ISceneState {
         private _fillColor = new Color(255, 0, 0)

@@ -1,5 +1,5 @@
 {
-  "name": "@nealrame/scene",
+  "name": "@nealrame/engine",
   "version": "0.0.1",
   "description": "",
   "main": "lib/index.ts",
