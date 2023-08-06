@@ -9,6 +9,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@nealrame/utils": "^0.0.1"
+    "@nealrame/utils": "^0.0.1",
+    "open-simplex-noise": "^2.5.0"
   }
 }
