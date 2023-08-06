@@ -1,13 +1,13 @@
 import {
-    Color,
-    type TRGBAColor,
-} from "./color"
-
-import {
     type TPoint,
     type TRect,
     type TSize,
-} from "../types"
+} from "../maths"
+
+import {
+    Color,
+    type TRGBAColor,
+} from "./color"
 
 export class Painter {
     private _context: CanvasRenderingContext2D

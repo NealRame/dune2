@@ -1,7 +1,7 @@
 import {
     type TPoint,
     type TSize,
-} from "./types"
+} from "./maths"
 
 export const KeyUp = 1 as const
 export const KeyDown = 2 as const
