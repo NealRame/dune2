@@ -2,14 +2,17 @@ import {
     padLeft,
 } from "@nealrame/utils"
 
-import {
-    type TRGBAColor,
-} from "./types"
-
 function toHex(
     v: number,
 ): string {
     return padLeft(v.toString(16), 2, "0")
+}
+
+export type TRGBAColor = {
+    r: number
+    g: number
+    b: number
+    a: number
 }
 
 export class Color implements TRGBAColor {

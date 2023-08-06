@@ -10,7 +10,7 @@ import type {
 
 import {
     Painter,
-} from './painter'
+} from './graphics/painter'
 
 export type TContextOptions = {
     canvas: HTMLCanvasElement,
