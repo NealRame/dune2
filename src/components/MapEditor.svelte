@@ -79,9 +79,6 @@
         const target = event.target as HTMLElement
 
         switch (target.dataset.role) {
-        case "seed":
-            noiseConfig.seed = Date.now()
-            break
         case "amplitude":
             noiseConfig.amplitude = parseFloat((target as HTMLInputElement).value)
             break
@@ -96,6 +93,9 @@
             break
         case "scale":
             noiseConfig.scale = parseFloat((target as HTMLInputElement).value)
+            break
+        case "seed":
+            noiseConfig.seed = Date.now()
             break
         default: return
         }
