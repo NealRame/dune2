@@ -6,6 +6,7 @@
     import Game from "./components/Game.svelte"
     import Home from "./components/Home.svelte"
     import Load from "./components/Load.svelte"
+    import MapEditor from "./components/MapEditor.svelte"
 
     import Dune2DataUrl from "./dune2.rc"
 
@@ -40,6 +41,8 @@
         <Home/>
     {:else if route === "/game"}
         <Game resources={resources}/>
+    {:else if route === "/map-editor"}
+        <MapEditor resources={resources}/>
     {:else}
         <h1>404</h1>
     {/if}

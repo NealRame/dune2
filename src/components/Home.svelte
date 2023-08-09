@@ -5,6 +5,7 @@
     </header>
     <ul>
       <li><a href="#/game">New Game</a></li>
+        <li><a href="#/map-editor">Map Editor</a></li>
       <li><a href="#/settings">Settings</a></li>
 </nav>
 

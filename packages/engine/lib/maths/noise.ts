@@ -6,7 +6,9 @@ import {
     type TPoint,
 } from "./types"
 
-export type TNoise2DGeneratorConfig = {
+export type TNoise2DGenerator = (pos: TPoint) => number
+
+export type TNoise2DGeneratorOptions = {
     amplitude?: number,
     frequency?: number,
     octaves?: number,
@@ -14,19 +16,23 @@ export type TNoise2DGeneratorConfig = {
     scale?: number,
     seed?: number,
 }
-export type TNoise2DFunction = (pos: TPoint) => number
 
 const noise2DGeneratorConfigDefaults = {
-    scale: 1,
     amplitude: 1,
     frequency: 1,
     octaves: 1,
     persistence: 0.5,
+    scale: 1,
 }
 
+/**
+ * Create a 2D noise generator.
+ * @param config generator configuration
+ * @returns a 2D noise generator
+ */
 export function createNoise2DGenerator(
-    config: TNoise2DGeneratorConfig = {},
-): TNoise2DFunction {
+    config: TNoise2DGeneratorOptions = {},
+): TNoise2DGenerator {
     const noise = makeNoise2D(config.seed ?? Date.now())
     const {
         scale,
@@ -36,13 +42,12 @@ export function createNoise2DGenerator(
         persistence,
     } = Object.assign({}, noise2DGeneratorConfigDefaults, config)
     return ({ x, y }): number => {
+        let value = 0
         x /= scale
         y /= scale
-        let value = 0
         for (let octave = 0; octave < octaves; octave++) {
-            x *= 2*frequency
-            y *= 2*frequency
-            value += noise(x, y)*(amplitude*Math.pow(persistence, octave))
+            const f = frequency*Math.pow(2, octave)
+            value += amplitude*Math.pow(persistence, octave)*noise(x*f, y*f)
         }
         return value/(2 - 1/Math.pow(2, octaves - 1))
     }

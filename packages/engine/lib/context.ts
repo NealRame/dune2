@@ -6,11 +6,11 @@ import type {
 import type {
     TPoint,
     TSize,
-} from './types'
+} from "./maths"
 
 import {
     Painter,
-} from './graphics/painter'
+} from "./graphics/painter"
 
 export type TContextOptions = {
     canvas: HTMLCanvasElement,
@@ -31,21 +31,25 @@ export class Context {
     private _painter: Painter
 
     private _onKeyDown = (event: KeyboardEvent) => {
-        event.preventDefault()
-        this._key = event.key
-        this._eventQueue.push({
-            type: Events.KeyDown,
-            key: event.key,
-        } as TEvent)
+        if (event.target === document.body) {
+            event.preventDefault()
+            this._key = event.key
+            this._eventQueue.push({
+                type: Events.KeyDown,
+                key: event.key,
+            } as TEvent)
+        }
     }
 
     private _onKeyUp = (event: KeyboardEvent) => {
-        event.preventDefault()
-        this._key = event.key
-        this._eventQueue.push({
-            type: Events.KeyUp,
-            key: event.key,
-        } as TEvent)
+        if (event.target === document.body) {
+            event.preventDefault()
+            this._key = event.key
+            this._eventQueue.push({
+                type: Events.KeyUp,
+                key: event.key,
+            } as TEvent)
+        }
     }
 
     private _onMouseDown = (event: MouseEvent) => {
@@ -120,6 +124,7 @@ export class Context {
         if (this._eventsAccepted & Events.KeyUp) {
             window.addEventListener("keyup", this._onKeyUp)
         }
+        this._canvas.focus()
     }
 
     public unbind() {
