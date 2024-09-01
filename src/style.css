@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    @font-face {
+        font-family: "dune-rise";
+        font-weight: normal;
+        font-style: normal;
+        font-display: block;
+        src: url("/assets/fonts/dune-rise/Dune-Rise.ttf") format("truetype");
+    }
+}
+
+:root {
+    @apply font-sans;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    @apply bg-black text-white;
+}
+
+#app {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}

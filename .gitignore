@@ -1,0 +1,14 @@
+.DS_Store
+
+lerna-debug.log*
+
+npm-debug.log*
+pnpm-debug.log*
+
+yarn-debug.log*
+yarn-error.log*
+
+data
+dist
+node_modules
+src/dune2.rc

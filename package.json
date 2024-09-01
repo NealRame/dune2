@@ -1,0 +1,39 @@
+{
+  "name": "fundamentals",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/esbuild/build.js",
+    "dev": "node scripts/esbuild/serve.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.2",
+    "@typescript-eslint/eslint-plugin": "8.3.0",
+    "@typescript-eslint/parser": "8.3.0",
+    "@vueuse/core": "11.0.3",
+    "@webgpu/types": "0.1.44",
+    "autoprefixer": "10.4.20",
+    "esbuild": "0.23.1",
+    "esbuild-plugin-copy": "2.1.1",
+    "esbuild-plugin-glsl": "1.2.2",
+    "esbuild-plugin-tsc": "0.4.0",
+    "esbuild-plugin-vue3": "0.4.2",
+    "esbuild-plugin-wasm": "^1.1.0",
+    "esbuild-style-plugin": "1.6.3",
+    "eslint": "^9.9.1",
+    "eslint-plugin-vue": "9.27.0",
+    "portscanner": "2.2.0",
+    "postcss": "^8.4.42",
+    "tailwindcss": "3.4.10",
+    "typescript": "5.5.4",
+    "vue": "3.4.38",
+    "vue-eslint-parser": "9.4.3",
+    "vue-router": "^4.4.3",
+    "vue-tsc": "^2.1.4",
+    "wasm-pack": "^0.13.0"
+  },
+  "workspaces": [
+    "packages/resources/packages/dune2/pkg"
+  ]
+}
