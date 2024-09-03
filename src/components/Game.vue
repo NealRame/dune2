@@ -42,22 +42,19 @@ async function loadGameResources() {
     const data = await res.arrayBuffer()
     const resources = Dune2Resources.load(new Uint8Array(data))
 
-    console.log(resources.getTilesets())
-    console.log(resources.getTileCount("terrain"))
-    console.log(resources.getTileCount("buildings"))
 
-    const tile_size = resources.getTileSize("buildings")
 
-    console.log(`buildings tile_size: ${tile_size.width}x${tile_size.height}`)
-    tile_size.free()
+    for (const tilesetId of resources.getTilesets()) {
+        const tileCount = resources.getTilesetTileCount(tilesetId)
+        const tileSize = resources.getTilesetTileSize(tilesetId)
 
-    for (let i = 0; i < resources.getTilemapCount(); ++i) {
-        const tilemap = resources.getTilemap(i)
+        const tilesetImageData = resources.getTilesetImageData(
+            tilesetId,
+            32
+        )
 
-        console.log(tilemap.getClass())
-        console.log(tilemap.getTiles())
-
-        tilemap.free()
+        console.log(tilesetImageData)
+        console.log(`${tilesetId} tileCount=${tileCount} tileSize=${tileSize.width}x${tileSize.height}`)
     }
 }
 
