@@ -8,12 +8,8 @@ export type TSize = {
     height: number
 }
 
-export type TPixelmap<T extends TPalette> = {
-    data: Array<keyof T>
-    size: TSize
-}
+export type TTextureMapping = Record<string, [TSize, ImageBitmap]>
 
-export type TBitmapData = {
-    data: Uint8Array | Uint8ClampedArray
-    size: TSize
+export type TGameResources = {
+    textures: TTextureMapping
 }
