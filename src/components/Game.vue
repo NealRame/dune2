@@ -12,20 +12,22 @@ import {
 } from "vue"
 
 import {
-    Dune2Resources,
-} from "@nealrame/dune2-rc"
-
-import {
     useResize,
 } from "../composables"
 
-import Dune2ResourcesURL from "../dune2.rc"
+import {
+    loadGameResources,
+} from "../dune2"
 
 import type {
+    TGameResources,
     TSize,
 } from "../types"
 
+
 const canvas = ref<HTMLCanvasElement | null>(null)
+const gameResources = ref<TGameResources | null>(null)
+
 const { devicePixelSize: size } = useResize(canvas)
 
 function resize(size: TSize) {
@@ -37,31 +39,39 @@ function resize(size: TSize) {
     }
 }
 
-async function loadGameResources() {
-    const res = await fetch(Dune2ResourcesURL)
-    const data = await res.arrayBuffer()
-    const resources = Dune2Resources.load(new Uint8Array(data))
+async function selectTileset(tilesetId: string) {
+    const context = unref(canvas)?.getContext("2d")
+    const texture = gameResources.value?.textures[tilesetId]
 
+    if (texture != null && context != null) {
+        const [_, image] = texture
+        const {
+            width: screenWidth,
+            height: screenHeight,
+        } = context.canvas
 
-
-    for (const tilesetId of resources.getTilesets()) {
-        const tileCount = resources.getTilesetTileCount(tilesetId)
-        const tileSize = resources.getTilesetTileSize(tilesetId)
-
-        const tilesetImageData = resources.getTilesetImageData(
-            tilesetId,
-            32
+        context.clearRect(0, 0, screenWidth, screenHeight)
+        context.drawImage(
+            image,
+            (screenWidth - image.width)/2,
+            (screenHeight - image.height)/2
         )
-
-        console.log(tilesetImageData)
-        console.log(`${tilesetId} tileCount=${tileCount} tileSize=${tileSize.width}x${tileSize.height}`)
     }
 }
 
 watch(size, resize)
-onMounted(loadGameResources)
+onMounted(async () => {
+    gameResources.value = await loadGameResources()
+})
 </script>
 
 <template>
     <canvas class="block w-full h-full" ref="canvas"></canvas>
+    <ul v-if="gameResources" class="absolute top-1 left-1">
+        <li v-for="(_,tilesetId) in gameResources.textures" :key="tilesetId">
+            <button
+                @click="() => selectTileset(tilesetId)"
+            >{{ tilesetId }}</button>
+        </li>
+    </ul>
 </template>
