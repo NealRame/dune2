@@ -6,9 +6,9 @@ import {
     watch,
 } from "vue"
 
-import type {
-    TSize,
-} from "../types"
+import {
+    type TSize,
+} from "@nealrame/maths"
 
 
 const SizeDefault: TSize = {

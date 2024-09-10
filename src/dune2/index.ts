@@ -3,17 +3,19 @@ import {
     Dune2Faction,
 } from "@nealrame/dune2-rc"
 
-import Dune2ResourcesURL from "./dune2.rc"
+import {
+    type TSize,
+} from "@nealrame/maths"
 
 import type {
     TGameResources,
-    TSize,
     TTextureMapping,
 } from "./types"
 
+import Dune2ResourcesURL from "./data.rc"
+
 
 const TextureTilesPerRow = 16
-
 
 async function generateTilesetFactionsTexture(
     resources: Dune2Resources,
@@ -53,21 +55,20 @@ async function generateTilesetFactionsTexture(
 
 async function generateTilesetTexture(
     resources: Dune2Resources,
-    tilesetId: string,
+    tileset: string,
 ): Promise<[string, [TSize, ImageBitmap]]> {
-    const rcTileSize = resources.getTilesetTileSize(tilesetId)
+    const rcTileSize = resources.getTilesetTileSize(tileset)
+    const imageData = resources.getTilesetImageData(tileset, TextureTilesPerRow)
 
+    const image = await createImageBitmap(imageData)
     const tileSize: TSize = {
         width: rcTileSize.width,
         height: rcTileSize.height,
     }
 
-    const imageData = resources.getTilesetImageData(tilesetId, TextureTilesPerRow)
-    const image = await createImageBitmap(imageData)
-
     rcTileSize.free()
 
-    return [tilesetId, [tileSize, image]]
+    return [tileset, [tileSize, image]]
 }
 
 async function generateTextures(
@@ -75,11 +76,11 @@ async function generateTextures(
 ): Promise<TTextureMapping> {
     return Object.fromEntries(
         await Promise.all(resources.getTilesets().map(
-            async tilesetId => {
-                if (tilesetId == "terrain") {
-                    return generateTilesetTexture(resources, tilesetId)
+            async tileset => {
+                if (tileset == "terrain") {
+                    return generateTilesetTexture(resources, tileset)
                 } else {
-                    return generateTilesetFactionsTexture(resources, tilesetId)
+                    return generateTilesetFactionsTexture(resources, tileset)
                 }
             }
         ))
@@ -97,3 +98,5 @@ export async function loadGameResources(): Promise<TGameResources> {
         textures
     }
 }
+
+export * from "./types"

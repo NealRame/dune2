@@ -12,17 +12,17 @@ import {
 } from "vue"
 
 import {
+    type TSize,
+} from "@nealrame/maths"
+
+import {
     useResize,
 } from "../composables"
 
 import {
+    type TGameResources,
     loadGameResources,
 } from "../dune2"
-
-import type {
-    TGameResources,
-    TSize,
-} from "../types"
 
 
 const canvas = ref<HTMLCanvasElement | null>(null)
