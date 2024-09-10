@@ -21,7 +21,7 @@ import {
 
 import {
     type TGameResources,
-    loadGameResources,
+    loadDune2Resources,
 } from "../dune2"
 
 
@@ -61,7 +61,7 @@ async function selectTileset(tilesetId: string) {
 
 watch(size, resize)
 onMounted(async () => {
-    gameResources.value = await loadGameResources()
+    gameResources.value = await loadDune2Resources()
 })
 </script>
 
