@@ -1,3 +1,3 @@
 [submodule "packages/resources"]
-	path = packages/resources
+	path = packages/dune2-resources
 	url = https://github.com/NealRame/dune2-resources.git
