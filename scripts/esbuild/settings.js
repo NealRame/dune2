@@ -13,7 +13,7 @@ export default function (options) {
     return {
         format: "esm",
         external: [
-            "/assets/fonts/*",
+            "/fonts/*",
         ],
         entryPoints: [
             "src/main.ts",
@@ -29,7 +29,7 @@ export default function (options) {
                 resolveFrom: "cwd",
                 assets: {
                     from: ["public/**/*"],
-                    to: ["dist/assets"],
+                    to: ["dist/"],
                 }
             }),
             esbuildPluginTsc({
