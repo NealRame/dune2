@@ -6,6 +6,7 @@ import {
 
 import Home from "./components/Home.vue"
 import Game from "./components/Game.vue"
+import MapEditor from "./components/MapEditor.vue"
 
 const routes: Array<RouteRecordRaw> = [{
     path: "/",
@@ -15,6 +16,10 @@ const routes: Array<RouteRecordRaw> = [{
     path: "/game",
     name: "game",
     component: Game,
+}, {
+    path: "/map-editor",
+    name: "map-editor",
+    component: MapEditor,
 }]
 
 const router = createRouter({

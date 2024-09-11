@@ -11,10 +11,6 @@ import {
 } from "vue"
 
 import {
-    storeToRefs,
-} from "pinia"
-
-import {
     type TSize,
 } from "@nealrame/maths"
 
@@ -28,7 +24,7 @@ import {
 
 
 const canvas = ref<HTMLCanvasElement | null>(null)
-const { gameResources } = storeToRefs(useGameResources())
+const store = useGameResources()
 
 const { devicePixelSize: size } = useResize(canvas)
 
@@ -43,7 +39,7 @@ function resize(size: TSize) {
 
 async function selectTileset(tilesetId: string) {
     const context = unref(canvas)?.getContext("2d")
-    const texture = gameResources.value?.textures[tilesetId]
+    const texture = store.gameResources?.textures[tilesetId]
 
     if (texture != null && context != null) {
         const [_, image] = texture
@@ -66,8 +62,8 @@ watch(size, resize)
 
 <template>
     <canvas class="block w-full h-full" ref="canvas"></canvas>
-    <ul v-if="gameResources" class="absolute top-1 left-1">
-        <li v-for="(_,tilesetId) in gameResources.textures" :key="tilesetId">
+    <ul v-if="store.gameResources" class="absolute top-1 left-1">
+        <li v-for="(_,tilesetId) in store.gameResources.textures" :key="tilesetId">
             <button
                 @click="() => selectTileset(tilesetId)"
             >{{ tilesetId }}</button>

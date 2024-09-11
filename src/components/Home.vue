@@ -44,6 +44,15 @@ const menuStyle = [
                         }"
                     >New Game</RouterLink>
                 </li>
+
+                <li>
+                    <RouterLink
+                        class="hover:text-red-600 transition-colors duration-300"
+                        :to="{
+                            name: 'map-editor',
+                        }"
+                    >Map Editor</RouterLink>
+                </li>
             </ul>
         </div>
     </div>
