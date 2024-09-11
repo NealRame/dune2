@@ -17,9 +17,9 @@ const routes: Array<RouteRecordRaw> = [{
     component: Game,
 }]
 
-const Router = createRouter({
+const router = createRouter({
     history: createWebHistory("/"),
     routes,
 })
 
-export default Router
+export default router
