@@ -3,6 +3,15 @@ export default { name: "Home" }
 </script>
 
 <script setup lang="ts">
+import {
+    storeToRefs,
+} from "pinia"
+
+import {
+    useGameResources,
+} from "../stores"
+
+const { loading, error } = storeToRefs(useGameResources())
 
 const menuStyle = [
     "flex",
@@ -23,15 +32,19 @@ const menuStyle = [
             <h1 class="border-b border-red-600 font-dune text-red-600 text-center text-8xl">Dune</h1>
             <h2 class="font-thin text-red-600 text-center text-4xl">The Battle for Arrakis</h2>
         </header>
-        <ul class="text-2xl">
-            <li>
-                <RouterLink
-                    class="hover:text-red-600 transition-colors duration-300"
-                    :to="{
-                        name: 'game',
-                    }"
-                >New Game</RouterLink>
-            </li>
-        </ul>
+        <div class="text-2xl">
+            <div v-if="loading">Loading...</div>
+            <div v-else-if="error">Something went wrong :-/</div>
+            <ul v-else>
+                <li>
+                    <RouterLink
+                        class="hover:text-red-600 transition-colors duration-300"
+                        :to="{
+                            name: 'game',
+                        }"
+                    >New Game</RouterLink>
+                </li>
+            </ul>
+        </div>
     </div>
 </template>

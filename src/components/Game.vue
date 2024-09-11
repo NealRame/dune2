@@ -5,11 +5,14 @@ export default { name: "Game" }
 <script setup lang="ts">
 
 import {
-    onMounted,
     ref,
     unref,
     watch,
 } from "vue"
+
+import {
+    storeToRefs,
+} from "pinia"
 
 import {
     type TSize,
@@ -20,13 +23,12 @@ import {
 } from "../composables"
 
 import {
-    type TGameResources,
-    loadDune2Resources,
-} from "../dune2"
+    useGameResources,
+} from "../stores"
 
 
 const canvas = ref<HTMLCanvasElement | null>(null)
-const gameResources = ref<TGameResources | null>(null)
+const { gameResources } = storeToRefs(useGameResources())
 
 const { devicePixelSize: size } = useResize(canvas)
 
@@ -60,9 +62,6 @@ async function selectTileset(tilesetId: string) {
 }
 
 watch(size, resize)
-onMounted(async () => {
-    gameResources.value = await loadDune2Resources()
-})
 </script>
 
 <template>
