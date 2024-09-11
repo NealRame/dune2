@@ -3,15 +3,21 @@ import {
     h,
 } from "vue"
 
+import {
+    createPinia,
+} from "pinia"
+
 import App from "./components/App.vue"
 
-import Router from "./router"
+import router from "./router"
 
 (function () {
+    const pinia = createPinia()
     const app = createApp({
         render: () => h(App),
     })
     app
-        .use(Router)
+        .use(pinia)
+        .use(router)
         .mount("#app")
 })()
