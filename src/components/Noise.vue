@@ -14,7 +14,7 @@ import {
 import {
     type TSize,
     type TNoiseConfig,
-    FBMConfigDefaults,
+    NoiseConfigDefault,
     createNoise2DGenerator,
     createRangeMapper,
     ENoiseFunction,
@@ -33,7 +33,7 @@ const store = useGameResources()
 const canvas = ref<HTMLCanvasElement | null>(null)
 
 const noiseConfig = reactive<TNoiseConfig>({
-    ...FBMConfigDefaults,
+    ...NoiseConfigDefault,
 })
 
 const noiseSize = reactive<TSize>({
