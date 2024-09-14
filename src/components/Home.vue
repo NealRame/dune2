@@ -49,9 +49,9 @@ const menuStyle = [
                     <RouterLink
                         class="hover:text-red-600 transition-colors duration-300"
                         :to="{
-                            name: 'map-editor',
+                            name: 'noise-editor',
                         }"
-                    >Map Editor</RouterLink>
+                    >Noise Editor</RouterLink>
                 </li>
             </ul>
         </div>

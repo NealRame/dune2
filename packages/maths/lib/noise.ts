@@ -13,18 +13,15 @@ import {
 
 export enum ENoiseFunction {
     None = "none",
+    Invert = "invert",
     Billowy = "billowy",
     Ridged = "ridged",
 }
 
-export type TFractionalBrownianMotionOptions = {
+export type TNoiseOptions = {
     // Initial amplitude of the noise.
     // Default to 1.0
     amplitude?: number
-
-    // Gain is the factor that the amplitude of each octave is multiplied by.
-    // Default to 1.0
-    gain?: number
 
     // Octave count i.e. the number of levels of detail.
     // Value will be clamped to the range [1, Infinity[.
@@ -36,8 +33,8 @@ export type TFractionalBrownianMotionOptions = {
     frequency?: number
 
     // Frequency multiplier between successive octaves.
-    // Default to 2.0
-    lacunarity?: number
+    // Default to 0.5
+    persistence?: number
 
     // Scale of the noise.
     // Value will be clamped to the range [Number.MIN_VALUE, Infinity[.
@@ -53,19 +50,23 @@ export type TFractionalBrownianMotionOptions = {
     type?: ENoiseFunction
 }
 
-type TFractionalBrownianMotionConfig = Required<TFractionalBrownianMotionOptions>
+export type TNoiseConfig = Required<TNoiseOptions>
 
-const FBMConfigDefaults: TFractionalBrownianMotionConfig = {
+export const FBMConfigDefaults: Readonly<TNoiseConfig> = {
     amplitude: 1.0,
-    gain: 1.0,
     octaves: 1.0,
     frequency: 1.0,
-    lacunarity: 2.0,
+    persistence: 0.5,
     scale: 1.0,
     seed: Date.now(),
     type: ENoiseFunction.None,
 }
 
+function invert(
+    fn: TNoise2DGenerator,
+): TNoise2DGenerator {
+    return (x, y) => -1*fn(x, y)
+}
 
 function billowy(
     fn: TNoise2DGenerator,
@@ -80,12 +81,14 @@ function ridged(
 }
 
 function createNoise(
-    config: TFractionalBrownianMotionConfig,
+    config: TNoiseConfig,
 ): TNoise2DGenerator {
     const noise = makeNoise2D(config.seed)
     switch (config.type) {
         case ENoiseFunction.None:
             return noise
+        case ENoiseFunction.Invert:
+            return invert(noise)
         case ENoiseFunction.Billowy:
             return billowy(noise)
         case ENoiseFunction.Ridged:
@@ -96,11 +99,11 @@ function createNoise(
 }
 
 function ensureNoiseConfig(
-    options: TFractionalBrownianMotionOptions,
-): TFractionalBrownianMotionConfig {
-    const config = Object.assign(
-        options,
+    options: TNoiseOptions,
+): TNoiseConfig {
+    const config = Object.assign({},
         FBMConfigDefaults,
+        options,
     )
 
     config.octaves = clamp(1, Infinity, config.octaves)
@@ -109,33 +112,28 @@ function ensureNoiseConfig(
     return config
 }
 
-/**
- * Create a 2D noise generator.
- * @param config generator configuration
- * @returns a 2D noise generator
- */
-export function createFractionalBrownianMotion(
-    options: TFractionalBrownianMotionOptions = {},
+export function createNoise2DGenerator(
+    options: TNoiseOptions = {},
 ): TNoise2DGenerator {
     const config = ensureNoiseConfig(options)
     const noise = createNoise(config)
     const {
-        gain,
-        octaves,
-        lacunarity,
         scale,
+        amplitude,
+        frequency,
+        octaves,
+        persistence,
     } = config
 
-    return (x, y): number => {
-        let amplitude = config.amplitude
-        let frequency = config.frequency
-        let sum = 0.0
-
-        for (let i = 0; i < octaves; i++) {
-            sum += amplitude*noise(x*frequency/scale, y*frequency/scale)
-            amplitude *= gain
-            frequency *= lacunarity
+    return (x: number, y: number): number => {
+        x /= scale
+        y /= scale
+        let value = 0
+        for (let octave = 0; octave < octaves; octave++) {
+            x *= 2*frequency
+            y *= 2*frequency
+            value += noise(x, y)*(amplitude*Math.pow(persistence, octave))
         }
-        return sum
+        return value/(2 - 1/Math.pow(2, octaves - 1))
     }
 }
