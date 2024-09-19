@@ -1,5 +1,5 @@
 {
-  "name": "fundamentals",
+  "name": "dune2",
   "private": true,
   "version": "0.0.1",
   "type": "module",
@@ -8,11 +8,10 @@
     "dev": "node scripts/esbuild/serve.js"
   },
   "devDependencies": {
-    "@types/node": "^22.5.2",
-    "@typescript-eslint/eslint-plugin": "^8.5.0",
-    "@typescript-eslint/parser": "^8.5.0",
-    "@vueuse/core": "^11.0.3",
-    "@webgpu/types": "0.1.44",
+    "@types/node": "22.5.5",
+    "@typescript-eslint/eslint-plugin": "8.6.0",
+    "@typescript-eslint/parser": "8.6.0",
+    "@vueuse/core": "11.1.0",
     "autoprefixer": "10.4.20",
     "esbuild": "0.23.1",
     "esbuild-plugin-copy": "2.1.1",
@@ -25,17 +24,18 @@
     "eslint-plugin-vue": "9.28.0",
     "pinia": "^2.2.2",
     "portscanner": "2.2.0",
-    "postcss": "^8.4.42",
-    "tailwindcss": "^3.4.11",
+    "postcss": "8.4.47",
+    "tailwindcss": "3.4.12",
     "typescript": "5.6.2",
-    "vue": "3.5.4",
+    "vue": "3.5.6",
     "vue-eslint-parser": "9.4.3",
-    "vue-router": "^4.4.3",
+    "vue-router": "4.4.5",
     "vue-tsc": "^2.1.4",
     "wasm-pack": "^0.13.0"
   },
   "workspaces": [
     "packages/dune2-resources/packages/dune2/pkg",
-    "packages/maths"
+    "packages/maths",
+    "packages/scene"
   ]
 }
