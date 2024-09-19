@@ -1,9 +1,8 @@
 <script lang="ts">
-export default { name: "Game" }
+export default { name: "Noise" }
 </script>
 
 <script setup lang="ts">
-
 import {
     ref,
     reactive,
