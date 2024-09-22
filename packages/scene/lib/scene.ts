@@ -37,13 +37,8 @@ function createLayerTexture(
     const {
         name,
         textureImage,
-        textureTileSize,
     } = config
     const { width, height } = textureImage
-
-    console.log(`texture image size : {${width}x${height}}`)
-    console.log(`texture tile size  : {${textureTileSize.width}x${textureTileSize.height}}`)
-
     const texture = device.createTexture({
         label: `layer ${name} - texture`,
         size: [width, height],
@@ -155,9 +150,6 @@ export class Scene implements IScene {
         private canvas_: HTMLCanvasElement,
         private device_: GPUDevice,
     ) {
-        console.log(`new Scene gridSize : {${this.gridSize_.width}x${this.gridSize_.height}}`)
-        console.log(`new Scene cellSize : {${this.cellSize_.width}x${this.cellSize_.height}}`)
-
         const format = navigator.gpu.getPreferredCanvasFormat()
         const context = this.canvas_.getContext("webgpu")
 
