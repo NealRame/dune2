@@ -3,9 +3,7 @@ import {
     type TSize,
 } from "@nealrame/maths"
 
-export interface ISceneLayer {
-    readonly name: string
-
+export interface ISceneLayerHandler {
     set(pos: TPoint, v: number): this
 }
 
@@ -17,9 +15,11 @@ export interface IScene {
     readonly isRunning: boolean
     readonly size: TSize
 
-    addLayer(name: string, bitmap: ImageBitmap): ISceneLayer
-    getLayerByIndex(index: number): ISceneLayer | null
-    getLayerByName(name: string): ISceneLayer | null
+    scale: number
+
+    addLayer(name: string, textureImage: ImageBitmap, textureTileSize: TSize): IScene
+    getLayerByIndex(index: number): ISceneLayerHandler | null
+    getLayerByName(name: string): ISceneLayerHandler | null
 
     start: () => void
     stop: () => void
