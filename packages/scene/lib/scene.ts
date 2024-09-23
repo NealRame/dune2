@@ -111,8 +111,7 @@ class SceneLayerHandler implements ISceneLayerHandler {
     ) { }
 
     public set(pos: TPoint, v: number): this {
-        const index = this.size_.width * pos.x + pos.y
-
+        const index = this.size_.width*pos.y + pos.x
         this.layerData_.data[index] = v
         return this
     }
