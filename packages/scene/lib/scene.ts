@@ -154,6 +154,11 @@ export class Scene implements IScene {
         const format = navigator.gpu.getPreferredCanvasFormat()
         const context = this.canvas_.getContext("webgpu")
 
+        const module = this.device_.createShaderModule({
+            label: "Scene shader",
+            code: shaderSource,
+        })
+
         if (context == null) {
             throw new Error("Failed to get a webgpu context!")
         } else {
@@ -163,13 +168,7 @@ export class Scene implements IScene {
             })
         }
 
-        this.textureFormat_ = format
         this.context_ = context
-
-        const module = this.device_.createShaderModule({
-            label: "Scene shader",
-            code: shaderSource,
-        })
 
         this.pipeline_ = this.device_.createRenderPipeline({
             label: "Scene pipeline",
@@ -181,7 +180,7 @@ export class Scene implements IScene {
             fragment: {
                 entryPoint: "fragment_shader",
                 module,
-                targets: [{ format: this.textureFormat }]
+                targets: [{ format }]
             }
         })
 
@@ -193,6 +192,8 @@ export class Scene implements IScene {
             size: this.sceneInputsValues.byteLength,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         })
+
+        this.textureFormat_ = format
     }
 
     public static async create(
