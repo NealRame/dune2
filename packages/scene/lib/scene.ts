@@ -171,8 +171,6 @@ export class Scene implements IScene {
             code: shaderSource,
         })
 
-        this.sampler_ = this.device_.createSampler()
-
         this.pipeline_ = this.device_.createRenderPipeline({
             label: "Scene pipeline",
             layout: "auto",
@@ -186,6 +184,8 @@ export class Scene implements IScene {
                 targets: [{ format: this.textureFormat }]
             }
         })
+
+        this.sampler_ = this.device_.createSampler()
 
         this.sceneInputsValues = new ArrayBuffer(40)
         this.sceneInputsBuffer = this.device_.createBuffer({
