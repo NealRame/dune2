@@ -26,6 +26,7 @@ type TSceneLayer = {
     bindGroup: GPUBindGroup
     data: Uint32Array
     dataStorage: GPUBuffer
+    modified: boolean
     name: string
 }
 
@@ -113,6 +114,7 @@ class SceneLayerHandler implements ISceneLayerHandler {
     public set(pos: TPoint, v: number): this {
         const index = this.size_.width*pos.y + pos.x
         this.layerData_.data[index] = v
+        this.layerData_.modified = true
         return this
     }
 }
@@ -292,11 +294,12 @@ export class Scene implements IScene {
             ],
         })
 
-        const layer = {
-            name,
+        const layer: TSceneLayer = {
             bindGroup,
             data: layerData,
             dataStorage: layerDataStorage,
+            modified: false,
+            name,
         }
 
         this.layers_.push(layer)
@@ -348,6 +351,13 @@ export class Scene implements IScene {
                 storeOp: "store",
             }],
         })
+
+        for (const layer of this.layers_) {
+            if (layer.modified) {
+                this.device.queue.writeBuffer(layer.dataStorage, 0, layer.data)
+                layer.modified = false
+            }
+        }
 
         for (const layer of this.layers_) {
             pass.setPipeline(this.pipeline_)
