@@ -7,12 +7,18 @@ import {
 } from "@nealrame/maths"
 
 import {
+    ISceneLayerHandler,
+    type IScene,
+} from "@nealrame/scene"
+
+import {
     type TMapGeneratorOptions,
     type TMapGeneratorConfig,
     type TTerrain,
     type TTerrainNeighborhood,
     TerrainType,
 } from "./types"
+import { renderer } from "./render"
 
 
 export const MapGeneratorConfigDefault: TMapGeneratorConfig = {
@@ -110,37 +116,44 @@ function spiceFieldGenerator(
 }
 
 export class Dune2Map {
-    private constructor(
-        private size_: TSize,
-        private terrains_: Array<TTerrain>,
-    ) {}
-
     public static generate(
         options: TMapGeneratorOptions,
     ): Dune2Map {
         const generatorConfig = ensureGeneratorConfig(options)
         const terrain = terrainTypeGenerator(generatorConfig)
-        const spice = spiceFieldGenerator(generatorConfig)
+        const spiceField = spiceFieldGenerator(generatorConfig)
         const size = generatorConfig.size
         const terrains = []
 
         for (let y = 0; y < size.height; ++y) {
-            for (let x = 0; x < size.width; ++x) {
-                const pos = { x, y }
-                const type = terrain(pos)
+        for (let x = 0; x < size.width; ++x) {
+            const pos = { x, y }
+            const spice = spiceField(pos)
+            const type = terrain(pos)
 
-                if (type == TerrainType.Sand) {
-                    terrains.push({
-                        type,
-                        spice: spice(pos)
-                    })
-                } else {
-                    terrains.push({ type })
-                }
+            if (type == TerrainType.Dunes || type == TerrainType.Sand) {
+                if (spice > 0.5)
+                terrains.push({
+                    type: TerrainType.Spice,
+                    spice,
+                })
+            } else {
+                terrains.push({
+                    type,
+                })
             }
-        }
+        }}
 
         return new Dune2Map(size, terrains)
+    }
+
+    public render: (layer: ISceneLayerHandler) => Dune2Map
+
+    public constructor(
+        private size_: TSize,
+        private terrains_: Array<TTerrain>,
+    ) {
+        this.render = renderer(this)
     }
 
     public terrainAt({x, y}: TPoint): TTerrain | null {
@@ -152,7 +165,7 @@ export class Dune2Map {
             return null
         }
 
-        return this.terrains_[x + y*this.size_.width]
+        return this.terrains_[y*this.size_.width + x]
     }
 
     public neighborhoodAt({x, y}: TPoint): TTerrainNeighborhood {
@@ -165,7 +178,9 @@ export class Dune2Map {
     }
 
     public get size(): TSize {
-        return {...this.size_}
+        return {...this.size_ }
     }
 
+    public get height() { return this.size_.height }
+    public get width()  { return this.size_.width }
 }
