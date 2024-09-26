@@ -12,16 +12,19 @@ import {
 } from "@nealrame/scene"
 
 import {
-    type TMapGeneratorOptions,
-    type TMapGeneratorConfig,
-    type TTerrain,
-    type TTerrainNeighborhood,
-    TerrainType,
+    renderer,
+} from "./render"
+
+import {
+    type TDune2MapGeneratorOptions,
+    type TDune2MapGeneratorConfig,
+    type TDune2Terrain,
+    type TDune2TerrainNeighborhood,
+    Dune2TerrainType,
 } from "./types"
-import { renderer } from "./render"
 
 
-export const MapGeneratorConfigDefault: TMapGeneratorConfig = {
+export const Dune2MapGeneratorConfigDefault: TDune2MapGeneratorConfig = {
     size: {
         width: 64,
         height: 64,
@@ -42,10 +45,10 @@ export const MapGeneratorConfigDefault: TMapGeneratorConfig = {
 }
 
 function ensureGeneratorConfig(
-    options: TMapGeneratorOptions,
-): TMapGeneratorConfig {
+    options: TDune2MapGeneratorOptions,
+): TDune2MapGeneratorConfig {
     const config = {
-        ...MapGeneratorConfigDefault,
+        ...Dune2MapGeneratorConfigDefault,
         seed: Date.now(),
         ...options,
     }
@@ -61,8 +64,8 @@ function ensureGeneratorConfig(
 }
 
 function terrainTypeGenerator(
-    config: TMapGeneratorConfig
-): (pos: TPoint) => TerrainType {
+    config: TDune2MapGeneratorConfig
+): (pos: TPoint) => Dune2TerrainType {
     const map = createRangeMapper(-1, 1, 0, 1)
     const noise = createNoise2DGenerator({
         seed: config.seed,
@@ -74,24 +77,24 @@ function terrainTypeGenerator(
         const v = map(noise(pos.x, pos.y))
 
         if (v >= config.terrainMountainsThreshold) {
-            return TerrainType.Mountain
+            return Dune2TerrainType.Mountain
         }
 
         if (v >= config.terrainMountainsThreshold) {
-            return TerrainType.Rock
+            return Dune2TerrainType.Rock
         }
 
         if (v >= config.terrainRockThreshold) {
-            return TerrainType.Sand
+            return Dune2TerrainType.Sand
         }
 
-        return TerrainType.Dunes
+        return Dune2TerrainType.Dunes
     }
 }
 
 
 function spiceFieldGenerator(
-    config: TMapGeneratorConfig
+    config: TDune2MapGeneratorConfig
 ): (pos: TPoint) => number {
     const map = createRangeMapper(-1, 1, 0, 1)
     const noise = createNoise2DGenerator({
@@ -117,7 +120,7 @@ function spiceFieldGenerator(
 
 export class Dune2Map {
     public static generate(
-        options: TMapGeneratorOptions,
+        options: TDune2MapGeneratorOptions,
     ): Dune2Map {
         const generatorConfig = ensureGeneratorConfig(options)
         const terrain = terrainTypeGenerator(generatorConfig)
@@ -131,10 +134,10 @@ export class Dune2Map {
             const spice = spiceField(pos)
             const type = terrain(pos)
 
-            if (type == TerrainType.Dunes || type == TerrainType.Sand) {
+            if (type == Dune2TerrainType.Dunes || type == Dune2TerrainType.Sand) {
                 if (spice > 0.5)
                 terrains.push({
-                    type: TerrainType.Spice,
+                    type: Dune2TerrainType.Spice,
                     spice,
                 })
             } else {
@@ -151,12 +154,12 @@ export class Dune2Map {
 
     public constructor(
         private size_: TSize,
-        private terrains_: Array<TTerrain>,
+        private terrains_: Array<TDune2Terrain>,
     ) {
         this.render = renderer(this)
     }
 
-    public terrainAt({x, y}: TPoint): TTerrain | null {
+    public terrainAt({x, y}: TPoint): TDune2Terrain | null {
         if (x < 0 || x >= this.size_.width) {
             return null
         }
@@ -168,7 +171,7 @@ export class Dune2Map {
         return this.terrains_[y*this.size_.width + x]
     }
 
-    public neighborhoodAt({x, y}: TPoint): TTerrainNeighborhood {
+    public neighborhoodAt({x, y}: TPoint): TDune2TerrainNeighborhood {
         return [
             this.terrainAt({x, y: y - 1 }), // North
             this.terrainAt({x: x + 1, y }), // East

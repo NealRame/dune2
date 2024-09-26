@@ -7,38 +7,43 @@ import {
 } from "./map"
 
 import {
-    type TTerrain,
-    type TTerrainNeighborhood,
-    TerrainType,
+    type TDune2Terrain,
+    type TDune2TerrainNeighborhood,
+    Dune2TerrainType,
 } from "./types"
 
 
-function isDunes(t: TTerrain | null): boolean {
-    return t?.type === TerrainType.Dunes
+function isDunes(t: TDune2Terrain | null): boolean {
+    return t?.type === Dune2TerrainType.Dunes
 }
 
-function isMountain(t: TTerrain | null): boolean {
-    return t?.type === TerrainType.Mountain
+function isMountain(t: TDune2Terrain | null): boolean {
+    return t?.type === Dune2TerrainType.Mountain
 }
 
-function isRock(t: TTerrain | null): boolean {
-    return t?.type === TerrainType.Rock
-        || t?.type === TerrainType.Mountain
+function isRock(t: TDune2Terrain | null): boolean {
+    return t?.type === Dune2TerrainType.Rock
+        || t?.type === Dune2TerrainType.Mountain
 }
 
-function isSpiceLo(t: TTerrain | null): boolean {
-    return t?.type === TerrainType.Spice
+function isSpiceLo(t: TDune2Terrain | null): boolean {
+    return t?.type === Dune2TerrainType.Spice
         && t.spice <= 0.5
 }
 
-function isSpiceHi(t: TTerrain | null): boolean {
-    return t?.type === TerrainType.Spice
+function isSpiceHi(t: TDune2Terrain | null): boolean {
+    return t?.type === Dune2TerrainType.Spice
         && t.spice > 0.5
 }
 
+function isSpice(t: TDune2Terrain | null): boolean {
+    return isSpiceLo(t)
+        || isSpiceHi(t)
+}
+
 function neighborhoodMask(
-    neighborhood: TTerrainNeighborhood,
-    pred: (t: TTerrain | null) => boolean,
+    neighborhood: TDune2TerrainNeighborhood,
+    pred: (t: TDune2Terrain | null) => boolean,
 ): number {
     const north = pred(neighborhood[0]) ? 1 : 0
     const east  = pred(neighborhood[1]) ? 1 : 0
@@ -49,31 +54,31 @@ function neighborhoodMask(
 }
 
 function renderRock(
-    neighborhood: TTerrainNeighborhood,
+    neighborhood: TDune2TerrainNeighborhood,
 ): number {
     return 1 + neighborhoodMask(neighborhood, isRock)
 }
 
 function renderDunes(
-    neighborhood: TTerrainNeighborhood,
+    neighborhood: TDune2TerrainNeighborhood,
 ): number {
     return 17 + neighborhoodMask(neighborhood, isDunes)
 }
 
 function renderMountain(
-    neighborhood: TTerrainNeighborhood,
+    neighborhood: TDune2TerrainNeighborhood,
 ): number {
     return 33 + neighborhoodMask(neighborhood, isMountain)
 }
 
 function renderSpice(
     spice: number,
-    neighborhood: TTerrainNeighborhood,
+    neighborhood: TDune2TerrainNeighborhood,
 ): number {
     if (spice > 0.5) {
         return 65 + neighborhoodMask(neighborhood, isSpiceHi)
     } else {
-        return 49 + neighborhoodMask(neighborhood, isSpiceLo)
+        return 49 + neighborhoodMask(neighborhood, isSpice)
     }
 }
 
@@ -85,23 +90,23 @@ export const renderer = (map: Dune2Map) => (layer: ISceneLayerHandler) => {
         const neighborhood = map.neighborhoodAt(pos)
 
         switch (terrain.type) {
-        case TerrainType.Sand:
+        case Dune2TerrainType.Sand:
             layer.set(pos, 0)
             break
 
-        case TerrainType.Spice:
+        case Dune2TerrainType.Spice:
             layer.set(pos, renderSpice(terrain.spice, neighborhood))
             break
 
-        case TerrainType.Dunes:
+        case Dune2TerrainType.Dunes:
             layer.set(pos, renderDunes(neighborhood))
             break
 
-        case TerrainType.Mountain:
+        case Dune2TerrainType.Mountain:
             layer.set(pos, renderMountain(neighborhood))
             break
 
-        case TerrainType.Rock:
+        case Dune2TerrainType.Rock:
             layer.set(pos, renderRock(neighborhood))
             break
         }

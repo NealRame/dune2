@@ -3,7 +3,7 @@ import {
 } from "@nealrame/maths"
 
 
-export enum TerrainType {
+export enum Dune2TerrainType {
     Dunes = 0,
     Rock,
     Mountain,
@@ -11,42 +11,42 @@ export enum TerrainType {
     Spice,
 }
 
-export type TTerrainDunes = {
-    type: TerrainType.Dunes,
+export type TDune2TerrainDunes = {
+    type: Dune2TerrainType.Dunes,
 }
 
-export type TTerrainRock = {
-    type: TerrainType.Rock,
+export type TDune2TerrainRock = {
+    type: Dune2TerrainType.Rock,
 }
 
-export type TTerrainMountain = {
-    type: TerrainType.Mountain,
+export type TDune2TerrainMountain = {
+    type: Dune2TerrainType.Mountain,
 }
 
-export type TTerrainSand = {
-    type: TerrainType.Sand,
+export type TDune2TerrainSand = {
+    type: Dune2TerrainType.Sand,
 }
 
-export type TTerrainSpice = {
-    type: TerrainType.Spice,
+export type TDune2TerrainSpice = {
+    type: Dune2TerrainType.Spice,
     spice: number
 }
 
-export type TTerrain =
-    TTerrainDunes
-    | TTerrainRock
-    | TTerrainMountain
-    | TTerrainSand
-    | TTerrainSpice
+export type TDune2Terrain =
+    TDune2TerrainDunes
+    | TDune2TerrainRock
+    | TDune2TerrainMountain
+    | TDune2TerrainSand
+    | TDune2TerrainSpice
 
-export type TTerrainNeighborhood = [
-    TTerrain | null,
-    TTerrain | null,
-    TTerrain | null,
-    TTerrain | null,
+export type TDune2TerrainNeighborhood = [
+    TDune2Terrain | null,
+    TDune2Terrain | null,
+    TDune2Terrain | null,
+    TDune2Terrain | null,
 ]
 
-export type TMapGeneratorOptions = {
+export type TDune2MapGeneratorOptions = {
     // Map size
     size: TSize
 
@@ -66,4 +66,4 @@ export type TMapGeneratorOptions = {
     spiceThreshold?: number,             // clamped to [ 0, 1 ]
     spiceSaturationThreshold?: number    // clamped to [ spiceThreshold, 1 ]
 }
-export type TMapGeneratorConfig = Required<TMapGeneratorOptions>
+export type TDune2MapGeneratorConfig = Required<TDune2MapGeneratorOptions>
