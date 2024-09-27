@@ -82,12 +82,15 @@ function renderSpice(
     }
 }
 
-export const renderer = (map: Dune2Map) => (layer: ISceneLayerHandler) => {
-    for (let y = 0; y < map.height; ++y) {
-    for (let x = 0; x < map.width; ++x) {
+export function render(
+    this: Dune2Map,
+    layer: ISceneLayerHandler,
+): Dune2Map {
+    for (let y = 0; y < this.height; ++y) {
+    for (let x = 0; x < this.width; ++x) {
         const pos = {x, y}
-        const terrain = map.terrainAt(pos)
-        const neighborhood = map.neighborhoodAt(pos)
+        const terrain = this.terrainAt(pos)
+        const neighborhood = this.neighborhoodAt(pos, terrain)
 
         switch (terrain.type) {
         case Dune2TerrainType.Sand:
@@ -109,7 +112,11 @@ export const renderer = (map: Dune2Map) => (layer: ISceneLayerHandler) => {
         case Dune2TerrainType.Rock:
             layer.set(pos, renderRock(neighborhood))
             break
+
+        default:
+            break
         }
     }}
-    return map
+
+    return this
 }

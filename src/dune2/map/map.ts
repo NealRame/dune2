@@ -12,7 +12,7 @@ import {
 } from "@nealrame/scene"
 
 import {
-    renderer,
+    render,
 } from "./render"
 
 import {
@@ -26,8 +26,8 @@ import {
 
 export const Dune2MapGeneratorConfigDefault: TDune2MapGeneratorConfig = {
     size: {
-        width: 64,
-        height: 64,
+        width: 16,
+        height: 16,
     },
 
     seed: 0,
@@ -80,11 +80,11 @@ function terrainTypeGenerator(
             return Dune2TerrainType.Mountain
         }
 
-        if (v >= config.terrainMountainsThreshold) {
+        if (v >= config.terrainRockThreshold) {
             return Dune2TerrainType.Rock
         }
 
-        if (v >= config.terrainRockThreshold) {
+        if (v >= config.terrainSandThreshold) {
             return Dune2TerrainType.Sand
         }
 
@@ -109,11 +109,9 @@ function spiceFieldGenerator(
             if (s >= config.spiceSaturationThreshold) {
                 return 1.0
             }
-
             if (s >= config.spiceThreshold) {
                 return 0.5
             }
-
             return 0
     }
 }
@@ -134,8 +132,9 @@ export class Dune2Map {
             const spice = spiceField(pos)
             const type = terrain(pos)
 
-            if (type == Dune2TerrainType.Dunes || type == Dune2TerrainType.Sand) {
-                if (spice > 0.5)
+            if ((type == Dune2TerrainType.Dunes || type == Dune2TerrainType.Sand)
+                && spice > 0
+            ) {
                 terrains.push({
                     type: Dune2TerrainType.Spice,
                     spice,
@@ -156,27 +155,33 @@ export class Dune2Map {
         private size_: TSize,
         private terrains_: Array<TDune2Terrain>,
     ) {
-        this.render = renderer(this)
+        this.render = render
     }
 
-    public terrainAt({x, y}: TPoint): TDune2Terrain | null {
+    public terrainAt(
+        {x, y}: TPoint,
+        fallback: TDune2Terrain | null = null,
+    ): TDune2Terrain | null {
         if (x < 0 || x >= this.size_.width) {
-            return null
+            return fallback
         }
 
         if (y < 0 || y >= this.size_.height) {
-            return null
+            return fallback
         }
 
         return this.terrains_[y*this.size_.width + x]
     }
 
-    public neighborhoodAt({x, y}: TPoint): TDune2TerrainNeighborhood {
+    public neighborhoodAt(
+        {x, y}: TPoint,
+        fallback: TDune2Terrain | null = null,
+    ): TDune2TerrainNeighborhood {
         return [
-            this.terrainAt({x, y: y - 1 }), // North
-            this.terrainAt({x: x + 1, y }), // East
-            this.terrainAt({x, y: y + 1 }), // South
-            this.terrainAt({x: x - 1, y }), // West
+            this.terrainAt({ x, y: y - 1 }, fallback), // North
+            this.terrainAt({ x: x + 1, y }, fallback), // East
+            this.terrainAt({ x, y: y + 1 }, fallback), // South
+            this.terrainAt({ x: x - 1, y }, fallback), // West
         ]
     }
 
