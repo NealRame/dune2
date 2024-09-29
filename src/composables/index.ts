@@ -1,3 +1,3 @@
 export * from "./useKeyboard"
-export * from "./useMouse.ts"
+export * from "./useMouse"
 export * from "./useResize"
