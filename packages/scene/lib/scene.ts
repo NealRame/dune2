@@ -103,7 +103,6 @@ function createLayerInputUniforms(
     return buffer
 }
 
-
 class SceneLayerHandler implements ISceneLayerHandler {
     public constructor(
         private size_: TSize,
