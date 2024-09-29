@@ -1,7 +1,6 @@
 import {
     type TPoint,
     type TSize,
-    clamp,
     Rect,
 } from "@nealrame/maths"
 
