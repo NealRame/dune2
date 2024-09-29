@@ -10,4 +10,6 @@ export type TSize = {
 
 export type TRect = TPoint & TSize
 
+export type TVector = TPoint
+
 export type TNoise2DGenerator = (x: number, y: number) => number
