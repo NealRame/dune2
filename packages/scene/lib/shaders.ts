@@ -1,7 +1,7 @@
 export const shaderSource = /* wgsl */ `
 
 struct Viewport {
-    offset: vec2f,
+    origin: vec2f,
     size: vec2f,
 };
 
@@ -9,7 +9,6 @@ struct SceneInputs {
     viewport: Viewport,
     cell_size: vec2f,
     grid_size: vec2f,
-    scale: u32,
 };
 
 struct LayerInputs {
@@ -32,9 +31,9 @@ fn vertex_coordinates(
     vertex: vec2f,
     instance_index: u32,
 ) -> vec4f {
-    let scale = f32(scene_inputs.scale);
     let cell_size = scene_inputs.cell_size;
     let grid_size = scene_inputs.grid_size;
+    let viewport_origin = scene_inputs.viewport.origin;
     let viewport_size = scene_inputs.viewport.size;
 
     var cell_xy = vec2f(
@@ -42,7 +41,8 @@ fn vertex_coordinates(
         floor(f32(instance_index)/grid_size.x),
     );
     cell_xy += vertex;            // cell corner coordinates
-    cell_xy *= scale*2*cell_size; // >-> [ 0..scale*2*cell_size*grid_size]
+    cell_xy *= cell_size;         // >-> [ 0..cell_size*grid_size]
+    cell_xy -= viewport_origin;
     cell_xy /= viewport_size;     // >-> [ 0..1]
     cell_xy *= 2;                 // >-> [ 0..2]
     cell_xy -= 1;                 // >-> [-1..1]

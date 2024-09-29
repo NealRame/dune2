@@ -1,7 +1,8 @@
 import {
+    type TPoint,
+    type TSize,
     clamp,
-    TPoint,
-    TSize,
+    Rect,
 } from "@nealrame/maths"
 
 import {
@@ -134,7 +135,7 @@ export class Scene implements IScene {
 
     private layers_: Array<TSceneLayer> = []
 
-    private scale_: number = 1
+    private viewport_: Rect
 
     private sceneTickCallback_: TSceneTickCallback | null = null
     private animationCallback_ = (time: number) => {
@@ -186,7 +187,7 @@ export class Scene implements IScene {
 
         this.sampler_ = this.device_.createSampler()
 
-        this.sceneInputsValues = new ArrayBuffer(40)
+        this.sceneInputsValues = new ArrayBuffer(32)
         this.sceneInputsBuffer = this.device_.createBuffer({
             label: "scene - VS Uniform Buffer",
             size: this.sceneInputsValues.byteLength,
@@ -194,6 +195,8 @@ export class Scene implements IScene {
         })
 
         this.textureFormat_ = format
+
+        this.viewport_ = new Rect(0, 0, this.canvas.width, this.canvas.height)
     }
 
     public static async create(
@@ -232,16 +235,23 @@ export class Scene implements IScene {
         return this.device_
     }
 
-    public get scale(): number {
-        return this.scale_
+    public get viewport() {
+        return Rect.FromRect(this.viewport_)
     }
 
-    public set scale(k: number) {
-        this.scale_ = Math.floor(clamp(1, Infinity, k))
+    public set viewport(vp: Rect) {
+        this.viewport_ = Rect.FromRect(vp)
+    }
+
+    public get gridSize(): TSize {
+        return this.gridSize_
     }
 
     public get size(): TSize {
-        return this.gridSize_
+        return {
+            width: this.gridSize_.width*this.cellSize_.width,
+            height: this.gridSize_.height*this.cellSize_.height,
+        }
     }
 
     public get textureFormat() {
@@ -259,7 +269,7 @@ export class Scene implements IScene {
 
         const config: TSceneLayerConfig = {
             name,
-            size: this.size,
+            size: this.gridSize,
             textureImage,
             textureTileSize,
         }
@@ -310,7 +320,7 @@ export class Scene implements IScene {
 
     getLayerByIndex(index: number): ISceneLayerHandler | null {
         if (index >= 0 && index < this.layers_.length) {
-            return new SceneLayerHandler(this.size, this.layers_[index])
+            return new SceneLayerHandler(this.gridSize, this.layers_[index])
         }
         return null
     }
@@ -324,19 +334,18 @@ export class Scene implements IScene {
     public render() {
         const inputsValuesViews = {
             viewport: {
-                offset: new Float32Array(this.sceneInputsValues, 0, 2),
+                origin: new Float32Array(this.sceneInputsValues, 0, 2),
                 size: new Float32Array(this.sceneInputsValues, 8, 2),
             },
             cellSize: new Float32Array(this.sceneInputsValues, 16, 2),
             gridSize: new Float32Array(this.sceneInputsValues, 24, 2),
-            scale: new Uint32Array(this.sceneInputsValues, 32, 1),
         }
 
-        inputsValuesViews.viewport.offset.set([0, 0])
-        inputsValuesViews.viewport.size.set([this.canvas.width, this.canvas.height])
+        inputsValuesViews.viewport.origin.set([this.viewport_.leftX, this.viewport_.topY])
+        inputsValuesViews.viewport.size.set([this.viewport_.width, this.viewport_.height])
+
         inputsValuesViews.cellSize.set([this.cellSize_.width, this.cellSize_.height])
-        inputsValuesViews.gridSize.set([this.size.width, this.size.height])
-        inputsValuesViews.scale.set([this.scale_])
+        inputsValuesViews.gridSize.set([this.gridSize.width, this.gridSize.height])
 
         this.device.queue.writeBuffer(this.sceneInputsBuffer, 0, this.sceneInputsValues)
 
@@ -363,7 +372,7 @@ export class Scene implements IScene {
         for (const layer of this.layers_) {
             pass.setPipeline(this.pipeline_)
             pass.setBindGroup(0, layer.bindGroup)
-            pass.draw(6, this.size.width*this.size.height)
+            pass.draw(6, this.gridSize.width*this.gridSize.height)
         }
 
         pass.end()
