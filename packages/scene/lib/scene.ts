@@ -30,7 +30,6 @@ type TSceneLayer = {
     name: string
 }
 
-
 function createLayerTexture(
     device: GPUDevice,
     config: TSceneLayerConfig,
@@ -118,7 +117,6 @@ class SceneLayerHandler implements ISceneLayerHandler {
         return this
     }
 }
-
 
 export class Scene implements IScene {
     private context_: GPUCanvasContext
