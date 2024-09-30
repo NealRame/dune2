@@ -1,3 +1,4 @@
 export * from "./useKeyboard"
-export * from "./useMouse"
+export * from "./useMouseGrab"
+export * from "./useMouseZoom"
 export * from "./useResize"

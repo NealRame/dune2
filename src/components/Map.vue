@@ -35,7 +35,8 @@ import {
 
 import {
     useKeyboard,
-    useMouse,
+    useMouseGrab,
+    useMouseZoom,
     useResize,
 } from "../composables"
 
@@ -52,15 +53,16 @@ import {
 const canvas = ref<HTMLCanvasElement | null>(null)
 
 const { devicePixelSize: size } = useResize(canvas)
-const { keyDown, keyRepeat } = useKeyboard(ev => {
-    return ev.key == "ArrowLeft"
-        || ev.key == "ArrowRight"
-        || ev.key == "ArrowUp"
-        || ev.key == "ArrowDown"
+const { keyDown } = useKeyboard(ev => {
+    return ev.code == "ArrowLeft"
+        || ev.code == "KeyA"
+        || ev.code == "ArrowRight"
+        || ev.code == "KeyD"
+        || ev.code == "ArrowUp"
+        || ev.code == "KeyW"
+        || ev.code == "ArrowDown"
+        || ev.code == "KeyS"
 })
-const {
-    mouseMovement,
-} = useMouse()
 
 const {
     gameResources,
@@ -132,18 +134,18 @@ function scaleDown() {
 
 watch(keyDown, flow(
     cond([
-        [matches({ key: "ArrowLeft"  }), constant(Vector.Left)],
-        [matches({ key: "ArrowRight" }), constant(Vector.Right)],
-        [matches({ key: "ArrowUp"    }), constant(Vector.Up)],
-        [matches({ key: "ArrowDown"  }), constant(Vector.Down)],
+        [matches({ code: "ArrowLeft"  }), constant(Vector.Left)],
+        [matches({ code: "KeyA"       }), constant(Vector.Left)],
+        [matches({ code: "ArrowRight" }), constant(Vector.Right)],
+        [matches({ code: "KeyD"       }), constant(Vector.Right)],
+        [matches({ code: "ArrowUp"    }), constant(Vector.Up)],
+        [matches({ code: "KeyW"       }), constant(Vector.Up)],
+        [matches({ code: "ArrowDown"  }), constant(Vector.Down)],
+        [matches({ code: "KeyS"       }), constant(Vector.Down)],
     ]),
     v => v?.mul(scene?.cellSize.width ?? 1),
     updateViewportOrigin,
 ))
-
-watch(mouseMovement, move => {
-    updateViewportOrigin(Vector.FromVector(move).mul(-1))
-})
 
 watch(
     [canvas, gameResources, dune2MapConfig, dune2MapSize],
@@ -171,11 +173,22 @@ watch(
     }
 )
 watch(size, resize)
+
+useMouseGrab({
+    move: movement => {
+        updateViewportOrigin(Vector.FromVector(movement).mul(-2/scale.value))
+    }
+})
+
+useMouseZoom({
+    zoomIn: scaleUp,
+    zoomOut: scaleDown,
+})
 </script>
 
 <template>
     <canvas
-        class="block w-full h-full cursor-pointer"
+        class="block w-full h-full"
         oncontextmenu="return false"
         ref="canvas"
     ></canvas>
