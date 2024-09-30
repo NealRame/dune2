@@ -196,8 +196,8 @@ export class Scene implements IScene {
     }
 
     public static async create(
-        gridSize: TSize,
         cellSize: TSize,
+        gridSize: TSize,
         canvas: HTMLCanvasElement,
     ) {
         const gpu = navigator.gpu
@@ -237,6 +237,10 @@ export class Scene implements IScene {
 
     public set viewport(vp: Rect) {
         this.viewport_ = Rect.FromRect(vp)
+    }
+
+    public get cellSize(): TSize {
+        return this.cellSize_
     }
 
     public get gridSize(): TSize {

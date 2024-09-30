@@ -15,6 +15,7 @@ export interface IScene {
     readonly textureFormat: GPUTextureFormat
     readonly isRunning: boolean
 
+    readonly cellSize: TSize
     readonly gridSize: TSize
     readonly size: TSize
 
