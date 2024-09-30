@@ -137,8 +137,8 @@ watch(keyDown, flow(
         [matches({ key: "ArrowUp"    }), constant(Vector.Up)],
         [matches({ key: "ArrowDown"  }), constant(Vector.Down)],
     ]),
-    v => v?.mul(1 + clamp(0, 32, keyRepeat.value)),
-    updateViewportOrigin
+    v => v?.mul(scene?.cellSize.width ?? 1),
+    updateViewportOrigin,
 ))
 
 watch(mouseMovement, move => {
@@ -158,7 +158,7 @@ watch(
 
         const [textureTileSize, textureImage] = gameResources.textures["terrain"]
 
-        scene = await Scene.create(config.size, textureTileSize, canvas)
+        scene = await Scene.create(textureTileSize, config.size, canvas)
         scene.viewport = Rect.FromPointAndSize(Vector.Zero, size.value)
         scene.addLayer("land", textureImage, textureTileSize)
 
