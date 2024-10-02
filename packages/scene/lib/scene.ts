@@ -281,28 +281,22 @@ export class Scene implements IScene {
         const bindGroup = this.device.createBindGroup({
             label: `layer ${name} - bind group`,
             layout: this.pipeline_.getBindGroupLayout(0),
-            entries: [
-                {
-                    binding: 0,
-                    resource: { buffer: this.sceneInputsBuffer },
-                },
-                {
-                    binding: 1,
-                    resource: { buffer: layerInputsBuffer},
-                },
-                {
-                    binding: 2,
-                    resource: { buffer: layerDataStorage },
-                },
-                {
-                    binding: 3,
-                    resource: this.sampler_,
-                },
-                {
-                    binding: 4,
-                    resource: texture.createView(),
-                }
-            ],
+            entries: [{
+                binding: 0,
+                resource: { buffer: this.sceneInputsBuffer },
+            }, {
+                binding: 1,
+                resource: { buffer: layerInputsBuffer},
+            }, {
+                binding: 2,
+                resource: { buffer: layerDataStorage },
+            }, {
+                binding: 3,
+                resource: this.sampler_,
+            }, {
+                binding: 4,
+                resource: texture.createView(),
+            }],
         })
 
         const layer: TSceneLayer = {
