@@ -138,19 +138,21 @@ watch(keyDown, flow(
 ))
 watch(
     [canvas, dune2GameResources, dune2MapConfig, dune2MapSize],
-    async ([canvas, gameResources, dune2MapConfig, dune2MapSize]) => {
+    async ([canvas, dune2GameResources, dune2MapConfig, dune2MapSize]) => {
         if (canvas == null) return
-        if (gameResources == null) return
+        if (dune2GameResources == null) return
 
         const config = {
             ...dune2MapConfig,
-            size: { ...dune2MapSize },
+            size: {
+                ...dune2MapSize,
+            },
         }
 
         const [
             textureTileSize,
             textureImage,
-        ] = gameResources.textures["terrain"]
+        ] = dune2GameResources.textures["terrain"]
 
         scene = await Scene.create(textureTileSize, config.size, canvas)
         scene.viewport = Rect.FromPointAndSize(Vector.Zero, size.value)
