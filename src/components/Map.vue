@@ -46,7 +46,7 @@ import {
 } from "../dune2"
 
 import {
-    useGameResources,
+    useDune2GameResources,
 } from "../stores"
 
 
@@ -65,9 +65,9 @@ const { keyDown } = useKeyboard(ev => {
 })
 
 const {
-    gameResources,
+    dune2GameResources,
     loading,
-} = storeToRefs(useGameResources())
+} = storeToRefs(useDune2GameResources())
 
 const showSettings = ref(true)
 const scale = ref(1)
@@ -137,7 +137,7 @@ watch(keyDown, flow(
     updateViewportOrigin,
 ))
 watch(
-    [canvas, gameResources, dune2MapConfig, dune2MapSize],
+    [canvas, dune2GameResources, dune2MapConfig, dune2MapSize],
     async ([canvas, gameResources, dune2MapConfig, dune2MapSize]) => {
         if (canvas == null) return
         if (gameResources == null) return

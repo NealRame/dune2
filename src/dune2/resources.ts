@@ -8,8 +8,8 @@ import {
 } from "@nealrame/maths"
 
 import type {
-    TGameResources,
-    TTextureMapping,
+    TDune2GameResources,
+    TDune2TextureMapping,
 } from "./types"
 
 import Dune2ResourcesURL from "./data.rc"
@@ -20,7 +20,7 @@ const TextureTilesPerRow = 16
 async function generateTilesetFactionsTexture(
     resources: Dune2Resources,
     tileset: string,
-): Promise<[string, TTextureMapping[string]]> {
+): Promise<[string, TDune2TextureMapping[string]]> {
     const rcTileCount = resources.getTilesetTileCount(tileset)
     const rcTileSize = resources.getTilesetTileSize(tileset)
 
@@ -73,7 +73,7 @@ async function generateTilesetTexture(
 
 async function generateTextures(
     resources: Dune2Resources,
-): Promise<TTextureMapping> {
+): Promise<TDune2TextureMapping> {
     return Object.fromEntries(
         await Promise.all(resources.getTilesets().map(
             async tileset => {
@@ -87,7 +87,7 @@ async function generateTextures(
     )
 }
 
-export async function loadDune2Resources(): Promise<TGameResources> {
+export async function loadDune2Resources(): Promise<TDune2GameResources> {
     const res = await fetch(Dune2ResourcesURL)
     const data = await res.arrayBuffer()
     const resources = Dune2Resources.load(new Uint8Array(data))

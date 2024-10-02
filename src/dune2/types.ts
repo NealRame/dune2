@@ -2,8 +2,8 @@ import {
     type TSize,
 } from "@nealrame/maths"
 
-export type TTextureMapping = Record<string, [TSize, ImageBitmap]>
+export type TDune2TextureMapping = Record<string, [TSize, ImageBitmap]>
 
-export type TGameResources = {
-    textures: TTextureMapping
+export type TDune2GameResources = {
+    textures: TDune2TextureMapping
 }

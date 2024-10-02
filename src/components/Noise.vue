@@ -24,11 +24,11 @@ import {
 } from "../composables"
 
 import {
-    useGameResources,
+    useDune2GameResources,
 } from "../stores"
 
 
-const store = useGameResources()
+const store = useDune2GameResources()
 const canvas = ref<HTMLCanvasElement | null>(null)
 
 const noiseConfig = reactive<TNoiseConfig>({

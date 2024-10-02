@@ -7,19 +7,19 @@ import {
 } from "pinia"
 
 import {
-    type TGameResources,
+    type TDune2GameResources,
     loadDune2Resources,
 } from "../dune2"
 
 
-export const useGameResources = defineStore("GameResources", () => {
+export const useDune2GameResources = defineStore("Dune2GameResources", () => {
     const loading = ref(true)
     const error = ref<Error | null>(null)
-    const gameResources = ref<TGameResources | null>(null)
+    const dune2GameResources = ref<TDune2GameResources | null>(null)
 
     loadDune2Resources()
         .then(rc => {
-            gameResources.value = rc
+            dune2GameResources.value = rc
         })
         .catch(err => {
             error.value = err as Error
@@ -29,7 +29,7 @@ export const useGameResources = defineStore("GameResources", () => {
         })
 
     return {
-        gameResources,
+        dune2GameResources,
         error,
         loading,
     }
