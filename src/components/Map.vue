@@ -112,16 +112,6 @@ function updateViewportSize(screenSize: TSize) {
     scene.render()
 }
 
-function resize(screenSize: TSize) {
-    const canvasEl = unref(canvas)
-    if (canvasEl != null) {
-        canvasEl.width = screenSize.width
-        canvasEl.height = screenSize.height
-
-        updateViewportSize(size.value)
-    }
-}
-
 function scaleUp() {
     scale.value = clamp(1, 4, scale.value + 1)
     updateViewportSize(size.value)
@@ -146,7 +136,6 @@ watch(keyDown, flow(
     v => v?.mul(scene?.cellSize.width ?? 1),
     updateViewportOrigin,
 ))
-
 watch(
     [canvas, gameResources, dune2MapConfig, dune2MapSize],
     async ([canvas, gameResources, dune2MapConfig, dune2MapSize]) => {
@@ -158,7 +147,10 @@ watch(
             size: { ...dune2MapSize },
         }
 
-        const [textureTileSize, textureImage] = gameResources.textures["terrain"]
+        const [
+            textureTileSize,
+            textureImage,
+        ] = gameResources.textures["terrain"]
 
         scene = await Scene.create(textureTileSize, config.size, canvas)
         scene.viewport = Rect.FromPointAndSize(Vector.Zero, size.value)
@@ -172,14 +164,21 @@ watch(
         scene.render()
     }
 )
-watch(size, resize)
+watch(size, size => {
+    const canvasEl = unref(canvas)
+    if (canvasEl != null) {
+        canvasEl.width = size.width
+        canvasEl.height = size.height
+
+        updateViewportSize(size)
+    }
+})
 
 useMouseGrab({
     move: movement => {
         updateViewportOrigin(Vector.FromVector(movement).mul(-2/scale.value))
     }
 })
-
 useMouseZoom({
     zoomIn: scaleUp,
     zoomOut: scaleDown,
