@@ -374,9 +374,10 @@ export class Scene implements IScene {
         this.device_.queue.submit([encoder.finish()])
     }
 
-    public start() {
+    public start(tickCallback?: TSceneTickCallback) {
         if (!this.running_) {
             this.running_ = true
+            this.sceneTickCallback_ = tickCallback ?? null
             this.animationRequestID_ =
                 window.requestAnimationFrame(this.animationCallback_)
         }
@@ -385,6 +386,7 @@ export class Scene implements IScene {
     public stop() {
         if (this.running_) {
             this.running_ = false
+            this.sceneTickCallback_ = null
             window.cancelAnimationFrame(this.animationRequestID_!)
         }
     }

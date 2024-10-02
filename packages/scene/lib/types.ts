@@ -25,7 +25,7 @@ export interface IScene {
     getLayerByIndex(index: number): ISceneLayerHandler | null
     getLayerByName(name: string): ISceneLayerHandler | null
 
-    start: () => void
+    start: (tickCallback?: TSceneTickCallback) => void
     stop: () => void
 
     render: () => void
