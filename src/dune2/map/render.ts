@@ -10,7 +10,7 @@ import {
     type TDune2Terrain,
     type TDune2TerrainNeighborhood,
     Dune2TerrainType,
-} from "./types"
+} from "../types"
 
 
 function isDunes(t: TDune2Terrain | null): boolean {

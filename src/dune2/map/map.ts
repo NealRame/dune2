@@ -21,7 +21,7 @@ import {
     type TDune2Terrain,
     type TDune2TerrainNeighborhood,
     Dune2TerrainType,
-} from "./types"
+} from "../types"
 
 
 export const Dune2MapGeneratorConfigDefault: TDune2MapGeneratorConfig = {
