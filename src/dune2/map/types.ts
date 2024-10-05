@@ -46,10 +46,7 @@ export type TDune2TerrainNeighborhood = [
     TDune2Terrain | null,
 ]
 
-export type TDune2MapGeneratorOptions = {
-    // Map size
-    size: TSize
-
+export type TDune2MapGeneratorOptions = TSize & {
     // Noise seed
     seed?: number,
     

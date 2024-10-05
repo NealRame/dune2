@@ -25,10 +25,8 @@ import {
 
 
 export const Dune2MapGeneratorConfigDefault: TDune2MapGeneratorConfig = {
-    size: {
-        width: 16,
-        height: 16,
-    },
+    width: 16,
+    height: 16,
 
     seed: 0,
 
@@ -121,13 +119,14 @@ export class Dune2Map {
         options: TDune2MapGeneratorOptions,
     ): Dune2Map {
         const generatorConfig = ensureGeneratorConfig(options)
+
         const terrain = terrainTypeGenerator(generatorConfig)
         const spiceField = spiceFieldGenerator(generatorConfig)
-        const size = generatorConfig.size
+
         const terrains = []
 
-        for (let y = 0; y < size.height; ++y) {
-        for (let x = 0; x < size.width; ++x) {
+        for (let y = 0; y < generatorConfig.height; ++y) {
+        for (let x = 0; x < generatorConfig.width; ++x) {
             const pos = { x, y }
             const spice = spiceField(pos)
             const type = terrain(pos)
@@ -146,7 +145,10 @@ export class Dune2Map {
             }
         }}
 
-        return new Dune2Map(size, terrains)
+        return new Dune2Map({
+            width: generatorConfig.width,
+            height: generatorConfig.height,
+        }, terrains)
     }
 
     public render: (layer: ISceneLayerHandler) => Dune2Map

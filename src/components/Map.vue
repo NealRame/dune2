@@ -142,24 +142,20 @@ watch(
         if (canvas == null) return
         if (dune2GameResources == null) return
 
-        const config = {
-            ...dune2MapConfig,
-            size: {
-                ...dune2MapSize,
-            },
-        }
-
         const [
             textureTileSize,
             textureImage,
         ] = dune2GameResources.textures["terrain"]
 
-        scene = await Scene.create(textureTileSize, config.size, canvas)
+        scene = await Scene.create(textureTileSize, { ...dune2MapSize }, canvas)
         scene.viewport = Rect.FromPointAndSize(Vector.Zero, size.value)
         scene.addLayer("land", textureImage, textureTileSize)
 
         const layer = scene.getLayerByName("land")
-        const dune2Map = Dune2Map.generate(config)
+        const dune2Map = Dune2Map.generate({
+            ...dune2MapConfig,
+            ...dune2MapSize,
+        })
 
         dune2Map.render(layer!)
 
