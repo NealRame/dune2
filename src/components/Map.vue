@@ -15,7 +15,6 @@ import {
 } from "pinia"
 
 import {
-    reactive,
     ref,
     unref,
     watch,
@@ -42,12 +41,18 @@ import {
 
 import {
     Dune2Map,
-    Dune2MapGeneratorConfigDefault,
+    Dune2MapSizeConfigModel,
+    Dune2MapSpiceConfigModel,
+    Dune2MapTerrainConfigModel,
 } from "../dune2"
 
 import {
     useDune2GameResources,
 } from "../stores"
+
+import {
+    ModelInspector,
+} from "./ModelInspector"
 
 
 const canvas = ref<HTMLCanvasElement | null>(null)
@@ -72,15 +77,13 @@ const {
 const showSettings = ref(true)
 const scale = ref(1)
 
-const dune2MapSize = reactive<TSize>({
-    width: 64,
-    height: 64,
-})
-const dune2MapConfig = reactive({
-    ...Dune2MapGeneratorConfigDefault,
-})
+const dune2MapSizeConfig = new Dune2MapSizeConfigModel()
+const dune2MapTerrainConfig = new Dune2MapTerrainConfigModel()
+const dune2MapSpiceConfig = new Dune2MapSpiceConfigModel()
 
+let seed = 0
 let scene: IScene | null = null
+
 
 function updateViewportOrigin(v?: Vector) {
     if (scene == null) return
@@ -122,6 +125,39 @@ function scaleDown() {
     updateViewportSize(size.value)
 }
 
+async function updateMapGeneratorSeed() {
+    seed = Date.now()
+    await updateMapGeneratorConfig()
+}
+
+async function updateMapGeneratorConfig() {
+    if (dune2GameResources.value == null) return
+    if (canvas.value == null) return
+
+    const dune2MapConfig = {
+        ...dune2MapSizeConfig,
+        ...dune2MapTerrainConfig,
+        ...dune2MapSpiceConfig,
+        seed,
+    }
+
+    const [
+        textureTileSize,
+        textureImage,
+    ] = dune2GameResources.value.textures["terrain"]
+
+    scene = await Scene.create(textureTileSize, dune2MapSizeConfig, canvas.value)
+    scene.viewport = Rect.FromPointAndSize(Vector.Zero, size.value)
+    scene.addLayer("land", textureImage, textureTileSize)
+
+    const layer = scene.getLayerByName("land")
+    const dune2Map = Dune2Map.generate(dune2MapConfig)
+
+    dune2Map.render(layer!)
+
+    scene.render()
+}
+
 watch(keyDown, flow(
     cond([
         [matches({ code: "ArrowLeft"  }), constant(Vector.Left)],
@@ -137,29 +173,12 @@ watch(keyDown, flow(
     updateViewportOrigin,
 ))
 watch(
-    [canvas, dune2GameResources, dune2MapConfig, dune2MapSize],
-    async ([canvas, dune2GameResources, dune2MapConfig, dune2MapSize]) => {
+    [canvas, dune2GameResources],
+    async ([canvas, dune2GameResources]) => {
         if (canvas == null) return
         if (dune2GameResources == null) return
 
-        const [
-            textureTileSize,
-            textureImage,
-        ] = dune2GameResources.textures["terrain"]
-
-        scene = await Scene.create(textureTileSize, { ...dune2MapSize }, canvas)
-        scene.viewport = Rect.FromPointAndSize(Vector.Zero, size.value)
-        scene.addLayer("land", textureImage, textureTileSize)
-
-        const layer = scene.getLayerByName("land")
-        const dune2Map = Dune2Map.generate({
-            ...dune2MapConfig,
-            ...dune2MapSize,
-        })
-
-        dune2Map.render(layer!)
-
-        scene.render()
+        updateMapGeneratorConfig()
     }
 )
 watch(size, size => {
@@ -213,167 +232,36 @@ useMouseZoom({
         <div v-if="showSettings"
             class="border rounded flex flex-col gap-2 p-1 text-sm"
         >
-            <section>
-                <h1 class="bg-gray-100 text-center text-gray-500 uppercase">Size</h1>
-                <div class="grid grid-cols-[1fr_auto_min-content] gap-1 p-1">
-                    <label
-                        class="text-right"
-                        for="map_w"
-                    >Width</label>
-                    <input
-                        id="map_w"
-                        class="px-1 text-black"
-                        type="range"
-                        min="4"
-                        max="256"
-                        step="1"
-                        v-model.number="dune2MapSize.width">
-                    <span>{{ dune2MapSize.width }}</span>
-                    <label
-                        class="text-right"
-                        for="map_h"
-                    >Height</label>
-                    <input
-                        id="map_h"
-                        class="px-1 text-black"
-                        type="range"
-                        min="4"
-                        max="256"
-                        step="1"
-                        v-model.number="dune2MapSize.height">
-                    <span>{{ dune2MapSize.height }}</span>
-                </div>
+            <section class="flex flex-col gap-2">
+                <h1 class="bg-gray-100 text-center text-gray-500 uppercase"
+                >Size</h1>
+                <ModelInspector
+                    :model="dune2MapSizeConfig"
+                    @changed="updateMapGeneratorConfig"
+                />
             </section>
 
-            <section>
-                <h1 class="bg-gray-100 text-center text-gray-500 uppercase">Terrain</h1>
-                <div class="grid grid-cols-[1fr_auto] gap-1 p-1">
-                    <label
-                        class="text-right"
-                        for="terrain_scale"
-                    >Scale</label>
-                    <input
-                        id="terrain_scale"
-                        class="px-1 text-black"
-                        type="range"
-                        min="1"
-                        max="256"
-                        step="1"
-                        v-model.number="dune2MapConfig.terrainScale">
-
-                    <label
-                        class="text-right"
-                        for="terrain_details"
-                    >Details</label>
-                    <input
-                        id="terrain_details"
-                        class="px-1 text-black"
-                        type="range"
-                        min="1"
-                        max="8"
-                        step="1"
-                        v-model.number="dune2MapConfig.terrainDetails">
-
-                    <label
-                        class="text-right"
-                        for="terrain_sand_threshold"
-                    >Sand Threshold</label>
-                    <input
-                        id="terrain_sand_threshold"
-                        class="px-1 text-black"
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.001"
-                        v-model.number="dune2MapConfig.terrainSandThreshold">
-
-                    <label
-                        class="text-right"
-                        for="terrain_rock_threshold"
-                    >Rock Threshold</label>
-                    <input
-                        id="terrain_rock_threshold"
-                        class="px-1 text-black"
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.001"
-                        v-model.number="dune2MapConfig.terrainRockThreshold">
-
-                    <label
-                        class="text-right"
-                        for="terrain_mountains_threshold"
-                    >Mountains Threshold</label>
-                    <input
-                        id="terrain_mountains_threshold"
-                        class="px-1 text-black"
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.001"
-                        v-model.number="dune2MapConfig.terrainMountainsThreshold">
-                </div>
+            <section class="flex flex-col gap-2">
+                <h1 class="bg-gray-100 text-center text-gray-500 uppercase"
+                >Terrain</h1>
+                <ModelInspector
+                    :model="dune2MapTerrainConfig"
+                    @changed="updateMapGeneratorConfig"
+                />
             </section>
 
-            <section>
-                <h1 class="bg-gray-100 text-center text-gray-500 uppercase">Spice</h1>
-                <div class="grid grid-cols-[1fr_auto] gap-1 p-1">
-                    <label
-                        class="text-right"
-                        for="spice_scale"
-                    >Scale</label>
-                    <input
-                        id="spice_scale"
-                        class="px-1 text-black"
-                        type="range"
-                        min="1"
-                        max="256"
-                        step="1"
-                        v-model.number="dune2MapConfig.spiceScale">
-
-                    <label
-                        class="text-right"
-                        for="spice_details"
-                    >Details</label>
-                    <input
-                        id="spice_details"
-                        class="px-1 text-black"
-                        type="range"
-                        min="1"
-                        max="8"
-                        step="1"
-                        v-model.number="dune2MapConfig.spiceDetails">
-
-                    <label
-                        class="text-right"
-                        for="spice_threshold"
-                    >Threshold</label>
-                    <input
-                        id="spice_threshold"
-                        class="px-1 text-black"
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.001"
-                        v-model.number="dune2MapConfig.spiceThreshold">
-
-                    <label
-                        class="text-right"
-                        for="spice_saturation_threshold"
-                    >Saturation Threshold</label>
-                    <input
-                        id="spice_saturation_threshold"
-                        class="px-1 text-black"
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.001"
-                        v-model.number="dune2MapConfig.spiceSaturationThreshold">
-                </div>
+            <section class="flex flex-col gap-2">
+                <h1 class="bg-gray-100 text-center text-gray-500 uppercase"
+                >Spice</h1>
+                <ModelInspector
+                    :model="dune2MapSpiceConfig"
+                    @changed="updateMapGeneratorConfig"
+                />
             </section>
+
             <button
                 class="border rounded col-span-2"
-                @click="dune2MapConfig.seed = Date.now()">
+                @click="updateMapGeneratorSeed">
                 Seed
             </button>
         </div>
