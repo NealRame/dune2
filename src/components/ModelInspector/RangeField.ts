@@ -1,6 +1,7 @@
 import {
     defineComponent,
     h,
+    ref,
 } from "vue"
 
 import {
@@ -27,6 +28,8 @@ export default defineComponent<{
             step
     } } = props
 
+    const v = ref(access.get(model))
+
     return () => {
         return [
             h("label", {
@@ -40,12 +43,13 @@ export default defineComponent<{
                 modelValue: access.get(model),
                 "onUpdate:modelValue": (value: number) => {
                     access.set(model, value)
+                    v.value = value
                     emit("changed", name)
                 }
             }),
             h("label", {
                 class: "text-left",
-                innerHTML: `${access.get(model)}`,
+                innerHTML: `${v.value}`,
             })
         ]
     }

@@ -13,7 +13,7 @@ import type {
 } from "../types"
 
 
-export class Dune2MapSizeConfig implements TDune2MapGeneratorSizeConfig {
+export class Dune2MapSizeConfigModel implements TDune2MapGeneratorSizeConfig {
     @range({
         min: 8,
         max: 256,
@@ -27,10 +27,11 @@ export class Dune2MapSizeConfig implements TDune2MapGeneratorSizeConfig {
     }) public height = 64
 }
 
-export class Dune2MapSpiceConfig
+export class Dune2MapSpiceConfigModel
     implements Required<TDune2MapGeneratorSpiceOptions>
 {
     @range({
+        label: "scale",
         min: 8,
         max: 256,
         step: 1,
@@ -38,6 +39,7 @@ export class Dune2MapSpiceConfig
         Dune2MapGeneratorConfigDefault.spiceScale
 
     @range({
+        label: "details",
         min: 1,
         max: 8,
         step: 1,
@@ -45,6 +47,7 @@ export class Dune2MapSpiceConfig
         Dune2MapGeneratorConfigDefault.spiceDetails
     
     @range({
+        label: "spice threshold",
         min: 0,
         max: 1,
         step: 0.01,
@@ -52,6 +55,7 @@ export class Dune2MapSpiceConfig
         Dune2MapGeneratorConfigDefault.spiceThreshold
 
     @range({
+        label: "spice saturation threshold",
         min: 0,
         max: 1,
         step: 0.01,
@@ -59,10 +63,11 @@ export class Dune2MapSpiceConfig
         Dune2MapGeneratorConfigDefault.spiceSaturationThreshold
 }
 
-export class Dune2MapTerrainConfig
+export class Dune2MapTerrainConfigModel
     implements Required<TDune2MapGeneratorTerrainOptions>
 {
     @range({
+        label: "scale",
         min: 8,
         max: 256,
         step: 1,
@@ -70,6 +75,7 @@ export class Dune2MapTerrainConfig
         Dune2MapGeneratorConfigDefault.terrainScale
 
     @range({
+        label: "details",
         min: 1,
         max: 8,
         step: 1,
@@ -77,6 +83,7 @@ export class Dune2MapTerrainConfig
         Dune2MapGeneratorConfigDefault.terrainDetails
 
     @range({
+        label: "sand threshold",
         min: 0,
         max: 1,
         step: 0.01,
@@ -84,6 +91,7 @@ export class Dune2MapTerrainConfig
         Dune2MapGeneratorConfigDefault.terrainSandThreshold
 
     @range({
+        label: "rock threshold",
         min: 0,
         max: 1,
         step: 0.01,
@@ -91,6 +99,7 @@ export class Dune2MapTerrainConfig
         Dune2MapGeneratorConfigDefault.terrainRockThreshold
 
     @range({
+        label: "moutain threshold",
         min: 0,
         max: 1,
         step: 0.01,
