@@ -52,7 +52,7 @@ export const ModelInspector = defineComponent<{
                 "gap-x-1",
                 "gap-y-1",
                 "grid",
-                "grid-cols-[auto_1fr_3rem]",
+                "grid-cols-[50%_1fr_3rem]",
                 "text-sm",
                 "text-white"
             ],

@@ -30,8 +30,8 @@ export default defineComponent<{
     return () => {
         return [
             h("label", {
-                class: "after:content-[':'] text-right",
-                innerHTML: label ?? name
+                class: "text-right",
+                innerHTML: label ?? name,
             }),
             h(InputRange, {
                 max,
@@ -44,10 +44,8 @@ export default defineComponent<{
                 }
             }),
             h("label", {
+                class: "text-left",
                 innerHTML: `${access.get(model)}`,
-                style: {
-                    textAlign: "right"
-                }
             })
         ]
     }
