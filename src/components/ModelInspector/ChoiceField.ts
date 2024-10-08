@@ -7,36 +7,44 @@ import {
     type TChoiceFieldConfig,
 } from "../../decorators"
 
-export default defineComponent<{
-    fieldMeta: TChoiceFieldConfig,
-    model: any,
-}, {
-    changed(name: string): void
-}>((props, { emit }) => {
-    const {
-        model,
-        fieldMeta: {
-            access,
-            label,
-            name,
-            values,
-    } } = props
+import type {
+    ICloneable,
+    TModelInspectorProps,
+} from "./types"
 
-    return () => {
-        return [
-            h("label", {
-                class: "after:content-[':'] text-right",
-                innerHTML: label ?? name,
-            }),
-            h("select", {
-                class: "bg-inherit border-2 col-span-2 cursor-pointer outline-0 rounded",
-                modelValue: access.get(model),
-                "onChange": (ev: InputEvent) => {
-                    const target = ev.target as HTMLSelectElement
-                    access.set(model, target.value)
-                    emit("changed", name)
-                },
-            }, values.map(innerHTML => h("option", { innerHTML }))),
-        ]
+
+type TModelInspectorChoiceFieldProps<T extends ICloneable> =
+    TModelInspectorProps<T> & {
+        modelFieldMeta: TChoiceFieldConfig,
     }
-}, { props: ["model", "fieldMeta"], emits: ["changed"] })
+
+export default defineComponent(
+    <T  extends ICloneable>(props: TModelInspectorChoiceFieldProps<T>, { emit }) => {
+        const {
+            modelValue,
+            modelFieldMeta: {
+                access,
+                label,
+                name,
+                values,
+        } } = props
+
+        return () => {
+            return [
+                h("label", {
+                    class: "after:content-[':'] text-right",
+                    innerHTML: label ?? name,
+                }),
+                h("select", {
+                    class: "bg-inherit border-2 col-span-2 cursor-pointer outline-0 rounded",
+                    modelValue: access.get(modelValue),
+                    "onChange": (ev: InputEvent) => {
+                        const target = ev.target as HTMLSelectElement
+                        emit("update:modelValue", target.value)
+                    },
+                }, values.map(innerHTML => h("option", { innerHTML }))),
+            ]
+        }
+    },
+    { props: ["modelFieldMeta", "modelValue"], emits: ["update:modelValue"] },
+)

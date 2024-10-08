@@ -25,6 +25,15 @@ export class Dune2MapSizeConfigModel implements TDune2MapGeneratorSizeConfig {
         max: 256,
         step: 1,
     }) public height = 64
+
+    clone() {
+        const size = new Dune2MapSizeConfigModel()
+
+        size.width = this.width
+        size.height = this.height
+
+        return size
+    }
 }
 
 export class Dune2MapSpiceConfigModel
@@ -61,6 +70,17 @@ export class Dune2MapSpiceConfigModel
         step: 0.01,
     }) public spiceSaturationThreshold =
         Dune2MapGeneratorConfigDefault.spiceSaturationThreshold
+
+    public clone() {
+        const config = new Dune2MapSpiceConfigModel()
+
+        config.spiceScale = this.spiceScale
+        config.spiceDetails = this.spiceDetails
+        config.spiceThreshold = this.spiceThreshold
+        config.spiceSaturationThreshold = this.spiceSaturationThreshold
+
+        return config
+    }
 }
 
 export class Dune2MapTerrainConfigModel
@@ -105,4 +125,16 @@ export class Dune2MapTerrainConfigModel
         step: 0.01,
     }) public terrainMountainsThreshold =
         Dune2MapGeneratorConfigDefault.terrainMountainsThreshold
+
+    public clone() {
+        const config = new Dune2MapTerrainConfigModel()
+
+        config.terrainScale = this.terrainScale
+        config.terrainDetails = this.terrainDetails
+        config.terrainSandThreshold = this.terrainSandThreshold
+        config.terrainRockThreshold = this.terrainRockThreshold
+        config.terrainMountainsThreshold = this.terrainMountainsThreshold
+
+        return config
+    }
 }

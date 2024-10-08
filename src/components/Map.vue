@@ -77,13 +77,14 @@ const {
 const showSettings = ref(true)
 const scale = ref(1)
 
-const dune2MapSizeConfig = new Dune2MapSizeConfigModel()
-const dune2MapTerrainConfig = new Dune2MapTerrainConfigModel()
-const dune2MapSpiceConfig = new Dune2MapSpiceConfigModel()
+const dune2MapSizeConfig = ref(new Dune2MapSizeConfigModel())
+const dune2MapTerrainConfig = ref(new Dune2MapTerrainConfigModel())
+const dune2MapSpiceConfig = ref(new Dune2MapSpiceConfigModel())
+const dune2MapSeed = ref({
+    seed: Date.now()
+})
 
-let seed = 0
 let scene: IScene | null = null
-
 
 function updateViewportOrigin(v?: Vector) {
     if (scene == null) return
@@ -115,30 +116,15 @@ function updateViewportSize(screenSize: TSize) {
     scene.render()
 }
 
-function scaleUp() {
-    scale.value = clamp(1, 4, scale.value + 1)
-    updateViewportSize(size.value)
-}
-
-function scaleDown() {
-    scale.value = clamp(1, 4, scale.value - 1)
-    updateViewportSize(size.value)
-}
-
-async function updateMapGeneratorSeed() {
-    seed = Date.now()
-    await updateMapGeneratorConfig()
-}
-
-async function updateMapGeneratorConfig() {
+async function updateScene() {
     if (dune2GameResources.value == null) return
     if (canvas.value == null) return
 
     const dune2MapConfig = {
-        ...dune2MapSizeConfig,
-        ...dune2MapTerrainConfig,
-        ...dune2MapSpiceConfig,
-        seed,
+        ...dune2MapSizeConfig.value,
+        ...dune2MapTerrainConfig.value,
+        ...dune2MapSpiceConfig.value,
+        ...dune2MapSeed.value,
     }
 
     const [
@@ -146,7 +132,7 @@ async function updateMapGeneratorConfig() {
         textureImage,
     ] = dune2GameResources.value.textures["terrain"]
 
-    scene = await Scene.create(textureTileSize, dune2MapSizeConfig, canvas.value)
+    scene = await Scene.create(textureTileSize, dune2MapSizeConfig.value, canvas.value)
     scene.viewport = Rect.FromPointAndSize(Vector.Zero, size.value)
     scene.addLayer("land", textureImage, textureTileSize)
 
@@ -157,6 +143,23 @@ async function updateMapGeneratorConfig() {
 
     scene.render()
 }
+
+function scaleUp() {
+    scale.value = clamp(1, 4, scale.value + 1)
+    updateViewportSize(size.value)
+}
+
+function scaleDown() {
+    scale.value = clamp(1, 4, scale.value - 1)
+    updateViewportSize(size.value)
+}
+
+watch([
+    dune2MapSizeConfig,
+    dune2MapTerrainConfig,
+    dune2MapSpiceConfig,
+    dune2MapSeed,
+], updateScene)
 
 watch(keyDown, flow(
     cond([
@@ -178,7 +181,7 @@ watch(
         if (canvas == null) return
         if (dune2GameResources == null) return
 
-        updateMapGeneratorConfig()
+        updateScene()
     }
 )
 watch(size, size => {
@@ -235,33 +238,26 @@ useMouseZoom({
             <section class="flex flex-col gap-2">
                 <h1 class="bg-gray-100 text-center text-gray-500 uppercase"
                 >Size</h1>
-                <ModelInspector
-                    :model="dune2MapSizeConfig"
-                    @changed="updateMapGeneratorConfig"
-                />
+                <ModelInspector v-model="dune2MapSizeConfig"/>
             </section>
 
             <section class="flex flex-col gap-2">
                 <h1 class="bg-gray-100 text-center text-gray-500 uppercase"
                 >Terrain</h1>
-                <ModelInspector
-                    :model="dune2MapTerrainConfig"
-                    @changed="updateMapGeneratorConfig"
+                <ModelInspector v-model="dune2MapTerrainConfig"
                 />
             </section>
 
             <section class="flex flex-col gap-2">
                 <h1 class="bg-gray-100 text-center text-gray-500 uppercase"
                 >Spice</h1>
-                <ModelInspector
-                    :model="dune2MapSpiceConfig"
-                    @changed="updateMapGeneratorConfig"
+                <ModelInspector v-model="dune2MapSpiceConfig"
                 />
             </section>
 
             <button
                 class="border rounded col-span-2"
-                @click="updateMapGeneratorSeed">
+                @click="() => dune2MapSeed = {seed: Date.now()}">
                 Seed
             </button>
         </div>
