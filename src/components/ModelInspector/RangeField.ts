@@ -1,7 +1,8 @@
 import {
     defineComponent,
     h,
-    ref,
+    toRef,
+    unref,
 } from "vue"
 
 import {
@@ -16,7 +17,6 @@ import type {
 } from "./types"
 
 
-
 type TModelInspectorRangeFieldProps<T extends ICloneable> =
     TModelInspectorProps<T> & {
         modelFieldMeta: TRangeFieldConfig,
@@ -25,7 +25,6 @@ type TModelInspectorRangeFieldProps<T extends ICloneable> =
 export default defineComponent(
     <T extends ICloneable>(props: TModelInspectorRangeFieldProps<T>, { emit }) => {
         const {
-            modelValue,
             modelFieldMeta: {
                 access,
                 label,
@@ -34,6 +33,7 @@ export default defineComponent(
                 min,
                 step
         } } = props
+        const modelValue = toRef(props, "modelValue")
 
         return () => {
             return [
@@ -45,14 +45,14 @@ export default defineComponent(
                     max,
                     min,
                     step,
-                    modelValue: access.get(modelValue),
+                    modelValue: access.get(unref(modelValue)),
                     "onUpdate:modelValue": (value: number) => {
                         emit("update:modelValue", value)
                     }
                 }),
                 h("label", {
                     class: "text-left",
-                    innerHTML: `${access.get(modelValue)}`,
+                    innerHTML: `${access.get(unref(modelValue))}`,
                 })
             ]
         }
