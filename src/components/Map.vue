@@ -156,6 +156,16 @@ function scaleDown() {
     updateViewportSize(size.value)
 }
 
+function copyToClipboard() {
+    const text = JSON.stringify({
+        ...dune2MapSizeConfig.value,
+        ...dune2MapTerrainConfig.value,
+        ...dune2MapSpiceConfig.value,
+        seed: dune2MapSeed.value,
+    }, null, "  ")
+    navigator.clipboard.writeText(text)
+}
+
 watch([
     dune2MapSizeConfig,
     dune2MapTerrainConfig,
@@ -222,6 +232,14 @@ useMouseZoom({
         <div v-if="showSettings"
             class="border rounded flex flex-col gap-2 p-1 text-sm"
         >
+            <section class="relative bg-white rounded-t-sm text-black p-1">
+                <h1 class="grow uppercase text-lg text-center">Map Generator</h1>
+                <button
+                    class="absolute top-1/2 right-1 -translate-y-1/2 hover:text-gray-700 active:text-gray-400"
+                    @click="copyToClipboard"
+                ><i class="fa-solid fa-copy"></i></button>
+            </section>
+
             <section class="flex flex-col gap-2">
                 <h1 class="bg-gray-100 text-center text-gray-500 uppercase"
                 >Size</h1>
@@ -253,7 +271,7 @@ useMouseZoom({
                     <button
                         class="border rounded col-span-2 px-2"
                         @click="randSeed">
-                        ♲
+                        <i class="fa-solid fa-shuffle"></i>
                     </button>
                 </div>
             </section>
@@ -262,16 +280,16 @@ useMouseZoom({
             <button
                 class="border rounded w-8 h-8"
                 @click="scaleUp"
-            >+</button>
+            ><i class="fa-solid fa-magnifying-glass-plus"></i></button>
             <button
                 class="border rounded w-8 h-8"
                 @click="scaleDown"
-            >-</button>
+            ><i class="fa-solid fa-magnifying-glass-minus"></i></button>
             <button
                 class="border rounded w-8 h-8"
                 :class="showSettings ? ['bg-white text-black'] : []"
                 @click="showSettings = !showSettings"
-            >⚙︎</button>
+            ><i class="fa-solid fa-gear"></i></button>
         </div>
     </div>
 </template>
