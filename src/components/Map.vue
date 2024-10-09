@@ -80,9 +80,7 @@ const scale = ref(1)
 const dune2MapSizeConfig = ref(new Dune2MapSizeConfigModel())
 const dune2MapTerrainConfig = ref(new Dune2MapTerrainConfigModel())
 const dune2MapSpiceConfig = ref(new Dune2MapSpiceConfigModel())
-const dune2MapSeed = ref({
-    seed: Date.now()
-})
+const dune2MapSeed = ref(0)
 
 let scene: IScene | null = null
 
@@ -124,7 +122,7 @@ async function updateScene() {
         ...dune2MapSizeConfig.value,
         ...dune2MapTerrainConfig.value,
         ...dune2MapSpiceConfig.value,
-        ...dune2MapSeed.value,
+        seed: dune2MapSeed.value,
     }
 
     const [
@@ -142,6 +140,10 @@ async function updateScene() {
     dune2Map.render(layer!)
 
     scene.render()
+}
+
+function randSeed() {
+    dune2MapSeed.value = Math.floor(Math.random()*Number.MAX_SAFE_INTEGER)
 }
 
 function scaleUp() {
@@ -217,21 +219,6 @@ useMouseZoom({
     <div v-else
         class="absolute bottom-4 right-4 flex gap-1"
     >
-        <div class="flex flex-col gap-1">
-            <button
-                class="border rounded w-8 h-8"
-                @click="scaleUp"
-            >+</button>
-            <button
-                class="border rounded w-8 h-8"
-                @click="scaleDown"
-            >-</button>
-            <button
-                class="border rounded w-8 h-8"
-                :class="showSettings ? ['bg-white text-black'] : []"
-                @click="showSettings = !showSettings"
-            >?</button>
-        </div>
         <div v-if="showSettings"
             class="border rounded flex flex-col gap-2 p-1 text-sm"
         >
@@ -244,22 +231,47 @@ useMouseZoom({
             <section class="flex flex-col gap-2">
                 <h1 class="bg-gray-100 text-center text-gray-500 uppercase"
                 >Terrain</h1>
-                <ModelInspector v-model="dune2MapTerrainConfig"
-                />
+                <ModelInspector v-model="dune2MapTerrainConfig"/>
             </section>
 
             <section class="flex flex-col gap-2">
                 <h1 class="bg-gray-100 text-center text-gray-500 uppercase"
                 >Spice</h1>
-                <ModelInspector v-model="dune2MapSpiceConfig"
-                />
+                <ModelInspector v-model="dune2MapSpiceConfig"/>
             </section>
 
+            <section class="flex flex-col gap-2">
+                <h1 class="bg-gray-100 text-center text-gray-500 uppercase"
+                >Seed</h1>
+                <div class="flex gap-1">
+                    <label for="seed-value">value</label>
+                    <input
+                        class="grow outline-none px-1 rounded text-black text-center"
+                        id="seed-value"
+                        type="number"
+                        v-model="dune2MapSeed">
+                    <button
+                        class="border rounded col-span-2 px-2"
+                        @click="randSeed">
+                        ♲
+                    </button>
+                </div>
+            </section>
+        </div>
+        <div class="flex flex-col-reverse gap-1">
             <button
-                class="border rounded col-span-2"
-                @click="() => dune2MapSeed = {seed: Date.now()}">
-                Seed
-            </button>
+                class="border rounded w-8 h-8"
+                @click="scaleUp"
+            >+</button>
+            <button
+                class="border rounded w-8 h-8"
+                @click="scaleDown"
+            >-</button>
+            <button
+                class="border rounded w-8 h-8"
+                :class="showSettings ? ['bg-white text-black'] : []"
+                @click="showSettings = !showSettings"
+            >⚙︎</button>
         </div>
     </div>
 </template>
