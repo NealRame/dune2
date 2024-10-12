@@ -57,7 +57,7 @@ import {
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 
-const { devicePixelSize: size } = useResize(canvas)
+const { devicePixelSize: screenSize } = useResize(canvas)
 const { keyDown } = useKeyboard(ev => {
     return ev.code == "ArrowLeft"
         || ev.code == "KeyA"
@@ -94,7 +94,10 @@ function updateViewportOrigin(v?: Vector) {
         const vpOrigin = Vector.FromVector(scene.viewport.topLeft).mutAdd(v)
 
         vpOrigin.x = clamp(0, scene.size.width - vpSize.width, vpOrigin.x)
+        vpOrigin.x = Math.floor(vpOrigin.x)
+
         vpOrigin.y = clamp(0, scene.size.height - vpSize.height, vpOrigin.y)
+        vpOrigin.y = Math.floor(vpOrigin.y)
 
         scene.viewport = Rect.FromPointAndSize(vpOrigin, vpSize)
         scene.render()
@@ -105,12 +108,30 @@ function updateViewportSize(screenSize: TSize) {
     if (scene == null) return
 
     const vpOrigin = scene.viewport.topLeft
-    const vpSize = {
-        width: screenSize.width/scale.value,
-        height: screenSize.height/scale.value,
+
+    const vpOldSize = scene.viewport.size
+    const vpNewSize = {
+        width: Math.floor(screenSize.width/scale.value),
+        height: Math.floor(screenSize.height/scale.value),
     }
 
-    scene.viewport = Rect.FromPointAndSize(vpOrigin, vpSize)
+    if (vpNewSize.width > scene.size.width) {
+        vpOrigin.x = Math.floor((scene.size.width - vpNewSize.width)/2)
+    } else {
+        vpOrigin.x += (vpOldSize.width - vpNewSize.width)/2
+        vpOrigin.x = clamp(0, scene.size.width - vpNewSize.width, vpOrigin.x)
+        vpOrigin.x = Math.floor(vpOrigin.x)
+    }
+
+    if (vpNewSize.height > scene.size.height) {
+        vpOrigin.y = Math.floor((scene.size.height - vpNewSize.height)/2)
+    } else {
+        vpOrigin.y += (vpOldSize.height - vpNewSize.height)/2
+        vpOrigin.y = clamp(0, scene.size.height - vpNewSize.height, vpOrigin.y)
+        vpOrigin.y = Math.floor(vpOrigin.y)
+    }
+
+    scene.viewport = Rect.FromPointAndSize(vpOrigin, vpNewSize)
     scene.render()
 }
 
@@ -130,8 +151,11 @@ async function updateScene() {
         textureImage,
     ] = dune2GameResources.value.textures["terrain"]
 
-    scene = await Scene.create(textureTileSize, dune2MapSizeConfig.value, canvas.value)
-    scene.viewport = Rect.FromPointAndSize(Vector.Zero, size.value)
+    scene = await Scene.create(
+        {...textureTileSize},
+        {...dune2MapSizeConfig.value},
+        canvas.value,
+    )
     scene.addLayer("land", textureImage, textureTileSize)
 
     const layer = scene.getLayerByName("land")
@@ -139,7 +163,7 @@ async function updateScene() {
 
     dune2Map.render(layer!)
 
-    scene.render()
+    updateViewportSize({...screenSize.value})
 }
 
 function randSeed() {
@@ -148,12 +172,12 @@ function randSeed() {
 
 function scaleUp() {
     scale.value = clamp(1, 4, scale.value + 1)
-    updateViewportSize(size.value)
+    updateViewportSize(screenSize.value)
 }
 
 function scaleDown() {
     scale.value = clamp(1, 4, scale.value - 1)
-    updateViewportSize(size.value)
+    updateViewportSize(screenSize.value)
 }
 
 function copyToClipboard() {
@@ -196,7 +220,7 @@ watch(
         updateScene()
     }
 )
-watch(size, size => {
+watch(screenSize, size => {
     const canvasEl = unref(canvas)
     if (canvasEl != null) {
         canvasEl.width = size.width
