@@ -26,7 +26,6 @@ struct VSOutput {
 @group(0) @binding(3) var layer_sampler: sampler;
 @group(0) @binding(4) var layer_texture: texture_2d<f32>;
 
-
 fn vertex_coordinates(
     vertex: vec2f,
     instance_index: u32,
@@ -56,16 +55,16 @@ fn texture_coordinates(
     instance_index: u32,
 ) -> vec2f {
     let tex_index = layer_data[instance_index];
-    var tex_tile_size = layer_inputs.texture_tile_size;
+    let tex_tile_size = layer_inputs.texture_tile_size;
     let tex_size = vec2f(textureDimensions(layer_texture));
 
     var tex_xy = vec2f(vec2u(
         tex_index%16,
         tex_index/16,
     ));
-    tex_xy += vertex;        // cell corner coordinates
-    tex_xy *= tex_tile_size; // >-> [0..tex_size]
-    tex_xy /= tex_size;      // >-> [0..1]
+    tex_xy += vertex;             // cell corner coordinates
+    tex_xy *= tex_tile_size;      // >-> [0..tex_size]
+    tex_xy /= tex_size;           // >-> [0..1]
 
     return tex_xy;
 }
@@ -77,13 +76,13 @@ fn vertex_shader(
 ) -> VSOutput {
     let positions = array(
         // first triangle
-        vec2f(0, 0), // (0, 0) +---+ (1, 0)
-        vec2f(1, 0), //        | /
-        vec2f(0, 1), // (0, 1) +
+        vec2f(0, 0),              // (0, 0) +---+ (1, 0)
+        vec2f(1, 0),              //        | /
+        vec2f(0, 1),              // (0, 1) +
         // second triangle
-        vec2f(1, 1), //            + (1, 0)
-        vec2f(0, 1), //          / |
-        vec2f(1, 0), // (0, 1) +---+ (1, 1)
+        vec2f(1, 1),              //            + (1, 0)
+        vec2f(0, 1),              //          / |
+        vec2f(1, 0),              // (0, 1) +---+ (1, 1)
     ); // two triangles to make a rectangle
     let pos = positions[vertex_index];
 
