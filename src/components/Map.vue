@@ -94,10 +94,7 @@ function updateViewportOrigin(v?: Vector) {
         const vpOrigin = Vector.FromVector(scene.viewport.topLeft).mutAdd(v)
 
         vpOrigin.x = clamp(0, scene.size.width - vpSize.width, vpOrigin.x)
-        vpOrigin.x = Math.floor(vpOrigin.x)
-
         vpOrigin.y = clamp(0, scene.size.height - vpSize.height, vpOrigin.y)
-        vpOrigin.y = Math.floor(vpOrigin.y)
 
         scene.viewport = Rect.FromPointAndSize(vpOrigin, vpSize)
         scene.render()
@@ -111,24 +108,22 @@ function updateViewportSize(screenSize: TSize) {
 
     const vpOldSize = scene.viewport.size
     const vpNewSize = {
-        width: Math.floor(screenSize.width/scale.value),
-        height: Math.floor(screenSize.height/scale.value),
+        width: screenSize.width/scale.value,
+        height: screenSize.height/scale.value,
     }
 
     if (vpNewSize.width > scene.size.width) {
-        vpOrigin.x = Math.floor((scene.size.width - vpNewSize.width)/2)
+        vpOrigin.x = (scene.size.width - vpNewSize.width)/2
     } else {
         vpOrigin.x += (vpOldSize.width - vpNewSize.width)/2
         vpOrigin.x = clamp(0, scene.size.width - vpNewSize.width, vpOrigin.x)
-        vpOrigin.x = Math.floor(vpOrigin.x)
     }
 
     if (vpNewSize.height > scene.size.height) {
-        vpOrigin.y = Math.floor((scene.size.height - vpNewSize.height)/2)
+        vpOrigin.y = (scene.size.height - vpNewSize.height)/2
     } else {
         vpOrigin.y += (vpOldSize.height - vpNewSize.height)/2
         vpOrigin.y = clamp(0, scene.size.height - vpNewSize.height, vpOrigin.y)
-        vpOrigin.y = Math.floor(vpOrigin.y)
     }
 
     scene.viewport = Rect.FromPointAndSize(vpOrigin, vpNewSize)
@@ -211,6 +206,7 @@ watch(keyDown, flow(
     v => v?.mul(scene?.cellSize.width ?? 1),
     updateViewportOrigin,
 ))
+
 watch(
     [canvas, dune2GameResources],
     async ([canvas, dune2GameResources]) => {
@@ -220,6 +216,7 @@ watch(
         updateScene()
     }
 )
+
 watch(screenSize, size => {
     const canvasEl = unref(canvas)
     if (canvasEl != null) {

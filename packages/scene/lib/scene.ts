@@ -236,7 +236,12 @@ export class Scene implements IScene {
     }
 
     public set viewport(vp: Rect) {
-        this.viewport_ = Rect.FromRect(vp)
+        const { topLeft, size } = vp
+        topLeft.x   = Math.floor(topLeft.x)
+        topLeft.y   = Math.floor(topLeft.y)
+        size.width  = Math.floor(size.width)
+        size.height = Math.floor(size.height)
+        this.viewport_ = Rect.FromPointAndSize(topLeft, size)
     }
 
     public get cellSize(): TSize {
