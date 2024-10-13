@@ -22,9 +22,9 @@ import {
 
 import {
     type TSize,
-    clamp,
     Rect,
     Vector,
+    clamp,
 } from "@nealrame/maths"
 
 import {
