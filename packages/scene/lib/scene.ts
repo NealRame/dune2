@@ -4,9 +4,7 @@ import {
     Rect,
 } from "@nealrame/maths"
 
-import {
-    shaderSource,
-} from "./shaders.ts"
+import shaderSource from "./shaders.wgsl"
 
 import {
     type IScene,

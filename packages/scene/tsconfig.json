@@ -22,6 +22,5 @@
 
     "types": ["@webgpu/types"]
   },
-  "include": ["lib/**/*.ts"],
+  "include": ["lib/**/*.ts", "lib/**/*.wgsl"],
 }
-

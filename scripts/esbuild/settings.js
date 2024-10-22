@@ -7,7 +7,6 @@ import vuePlugin from "esbuild-plugin-vue3"
 import { copy } from "esbuild-plugin-copy"
 import { glsl } from "esbuild-plugin-glsl"
 import { wasmLoader as wasm } from "esbuild-plugin-wasm"
-import path from "path"
 
 export default function (options) {
     return {
@@ -20,7 +19,8 @@ export default function (options) {
             "src/style.css",
         ],
         loader: {
-            ".rc": "file"
+            ".rc": "file",
+            ".wgsl": "text",
         },
         outdir: "dist",
         bundle: true,
@@ -43,7 +43,7 @@ export default function (options) {
                 postcss: {
                     plugins: [tailwindcss, autoprefixer]
                 }
-                
+
             }),
             vuePlugin(),
             wasm(),

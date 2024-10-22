@@ -1,5 +1,3 @@
-export const shaderSource = /* wgsl */ `
-
 struct Viewport {
     origin: vec2f,
     size: vec2f,
@@ -102,4 +100,3 @@ fn fragment_shader(
         fs_inputs.texture_coordinates,
     );
 }
-`
