@@ -101,15 +101,15 @@ function updateViewportOrigin(v?: Vector) {
     }
 }
 
-function updateViewportSize(screenSize: TSize) {
+function updateViewportSize() {
     if (scene == null) return
 
     const vpOrigin = scene.viewport.topLeft
 
     const vpOldSize = scene.viewport.size
     const vpNewSize = {
-        width: screenSize.width/scale.value,
-        height: screenSize.height/scale.value,
+        width: screenSize.value.width/scale.value,
+        height: screenSize.value.height/scale.value,
     }
 
     if (vpNewSize.width > scene.size.width) {
@@ -158,7 +158,7 @@ async function updateScene() {
 
     dune2Map.render(layer!)
 
-    updateViewportSize({...screenSize.value})
+    updateViewportSize()
 }
 
 function randSeed() {
@@ -167,12 +167,10 @@ function randSeed() {
 
 function scaleUp() {
     scale.value = clamp(1, 4, scale.value + 1)
-    updateViewportSize(screenSize.value)
 }
 
 function scaleDown() {
     scale.value = clamp(1, 4, scale.value - 1)
-    updateViewportSize(screenSize.value)
 }
 
 function copyToClipboard() {
@@ -217,13 +215,15 @@ watch(
     }
 )
 
+watch(scale, updateViewportSize)
+
 watch(screenSize, size => {
     const canvasEl = unref(canvas)
+
     if (canvasEl != null) {
         canvasEl.width = size.width
         canvasEl.height = size.height
-
-        updateViewportSize(size)
+        updateViewportSize()
     }
 })
 
