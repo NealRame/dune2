@@ -23,6 +23,7 @@ import {
 import {
     type TSize,
     Rect,
+    TPoint,
     Vector,
     clamp,
 } from "@nealrame/maths"
@@ -83,6 +84,8 @@ const dune2MapSpiceConfig = ref(new Dune2MapSpiceConfigModel())
 const dune2MapSeed = ref(0)
 
 let scene: IScene | null = null
+let sceneViewportOrigin: TPoint | null = null
+let sceneViewportSize: TSize | null = null
 
 function updateViewportOrigin(v?: Vector) {
     if (scene == null) return
@@ -96,6 +99,8 @@ function updateViewportOrigin(v?: Vector) {
         vpOrigin.x = clamp(0, scene.size.width - vpSize.width, vpOrigin.x)
         vpOrigin.y = clamp(0, scene.size.height - vpSize.height, vpOrigin.y)
 
+        sceneViewportOrigin = vpOrigin
+
         scene.viewport = Rect.FromPointAndSize(vpOrigin, vpSize)
         scene.render()
     }
@@ -104,9 +109,9 @@ function updateViewportOrigin(v?: Vector) {
 function updateViewportSize() {
     if (scene == null) return
 
-    const vpOrigin = scene.viewport.topLeft
+    const vpOrigin = sceneViewportOrigin ?? scene.viewport.topLeft
 
-    const vpOldSize = scene.viewport.size
+    const vpOldSize = sceneViewportSize ?? scene.viewport.size
     const vpNewSize = {
         width: screenSize.value.width/scale.value,
         height: screenSize.value.height/scale.value,
@@ -125,6 +130,9 @@ function updateViewportSize() {
         vpOrigin.y += (vpOldSize.height - vpNewSize.height)/2
         vpOrigin.y = clamp(0, scene.size.height - vpNewSize.height, vpOrigin.y)
     }
+
+    sceneViewportOrigin = vpOrigin
+    sceneViewportSize = vpNewSize
 
     scene.viewport = Rect.FromPointAndSize(vpOrigin, vpNewSize)
     scene.render()
@@ -157,7 +165,6 @@ async function updateScene() {
     const dune2Map = Dune2Map.generate(dune2MapConfig)
 
     dune2Map.render(layer!)
-
     updateViewportSize()
 }
 
