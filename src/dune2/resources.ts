@@ -77,7 +77,7 @@ async function generateTextures(
     return Object.fromEntries(
         await Promise.all(resources.getTilesets().map(
             async tileset => {
-                if (tileset == "terrain") {
+                if (tileset == "fog" || tileset == "terrain") {
                     return generateTilesetTexture(resources, tileset)
                 } else {
                     return generateTilesetFactionsTexture(resources, tileset)
