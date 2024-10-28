@@ -25,6 +25,7 @@ import {
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 const store = useDune2GameResources()
+const currentTileset = ref<string|null>(null)
 
 const { devicePixelSize: size } = useResize(canvas)
 
@@ -48,13 +49,16 @@ async function selectTileset(tilesetId: string) {
             height: screenHeight,
         } = context.canvas
 
+        const x = (screenWidth - image.width)/2
+        const y = (screenHeight - image.height)/2
+
         context.clearRect(0, 0, screenWidth, screenHeight)
-        context.drawImage(
-            image,
-            (screenWidth - image.width)/2,
-            (screenHeight - image.height)/2
-        )
+        context.fillStyle = "#f0f"
+        context.fillRect(x, y, image.width, image.height)
+        context.drawImage(image, x, y)
     }
+
+    currentTileset.value = tilesetId
 }
 
 watch(size, resize)
@@ -64,6 +68,8 @@ watch(size, resize)
     <canvas class="block w-full h-full" ref="canvas"></canvas>
     <ul v-if="store.dune2GameResources" class="absolute top-1 left-1">
         <li v-for="(_,tilesetId) in store.dune2GameResources.textures"
+            class="px-2"
+            :class="currentTileset === tilesetId ? ['text-red-600', 'font-bold'] : []"
             :key="tilesetId"
         >
             <button

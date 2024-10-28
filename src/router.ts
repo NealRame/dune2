@@ -5,7 +5,7 @@ import {
 } from "vue-router"
 
 import Home from "./components/Home.vue"
-import Game from "./components/Game.vue"
+import Tilesets from "./components/Tilesets.vue"
 import Map from "./components/Map.vue"
 import Noise from "./components/Noise.vue"
 
@@ -14,13 +14,13 @@ const routes: Array<RouteRecordRaw> = [{
     name: "home",
     component: Home,
 }, {
-    path: "/game",
-    name: "game",
-    component: Game,
-}, {
     path: "/map-editor",
     name: "map-editor",
     component: Map,
+}, {
+    path: "/tilesets",
+    name: "tilesets",
+    component: Tilesets,
 }, {
     path: "/noise-editor",
     name: "noise-editor",
