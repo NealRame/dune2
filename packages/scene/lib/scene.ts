@@ -22,7 +22,7 @@ type TSceneLayerConfig = {
 
 type TSceneLayer = {
     bindGroup: GPUBindGroup
-    data: Uint32Array
+    data: Int32Array
     dataStorage: GPUBuffer
     modified: boolean
     name: string
@@ -57,13 +57,13 @@ function createLayerTexture(
 function createLayerDataStorage(
     device: GPUDevice,
     config: TSceneLayerConfig,
-): [Uint32Array, GPUBuffer] {
+): [Int32Array, GPUBuffer] {
     const {
         name,
         size: { width, height },
     } = config
 
-    const data = new Uint32Array(height*width)
+    const data = new Int32Array(height*width)
     const buffer = device.createBuffer({
         label: `layer ${name} - storage buffer`,
         size: data.byteLength,
@@ -175,8 +175,18 @@ export class Scene implements IScene {
             fragment: {
                 entryPoint: "fragment_shader",
                 module,
-                targets: [{ format }]
-            }
+                targets: [{
+                    format,
+                    blend: {
+                        alpha: { },
+                        color: {
+                            operation: "add",
+                            srcFactor: "one",
+                            dstFactor: "one-minus-src-alpha"
+                        },
+                    },
+                }],
+            },
         })
 
         this.sampler_ = this.device_.createSampler()
