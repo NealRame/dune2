@@ -4,7 +4,7 @@ import {
     Rect,
 } from "@nealrame/maths"
 
-import shaderSource from "./shaders.wgsl"
+import shaders from "./shaders"
 
 import {
     type IScene,
@@ -151,7 +151,7 @@ export class Scene implements IScene {
 
         const module = this.device_.createShaderModule({
             label: "Scene shader",
-            code: shaderSource,
+            code: shaders.TilemapShaderSource,
         })
 
         if (context == null) {
