@@ -1,5 +1,1 @@
-import TilemapShaderSource from "./tilemap.wgsl"
-
-export default {
-    TilemapShaderSource,
-} as const
+export { default as TilemapShaderSource} from "./tilemap.wgsl"
