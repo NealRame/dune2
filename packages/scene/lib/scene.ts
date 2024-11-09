@@ -70,8 +70,7 @@ function createLayerDataStorage(
     const buffer = device.createBuffer({
         label: `layer ${name} - storage buffer`,
         size: data.byteLength,
-        usage: GPUBufferUsage.STORAGE
-            | GPUBufferUsage.COPY_DST,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
     })
 
     return [data, buffer]
@@ -91,8 +90,7 @@ function createLayerInputUniforms(
     const buffer = device.createBuffer({
         label: `layer ${name} - input uniforms`,
         size: values.byteLength,
-        usage: GPUBufferUsage.UNIFORM
-            | GPUBufferUsage.COPY_DST,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     })
 
     const views = {
@@ -278,7 +276,7 @@ export class Scene implements IScene {
         return this.textureFormat_
     }
 
-    addLayer(
+    public addLayer(
         name: string,
         textureImage: ImageBitmap,
         textureTileSize: TSize,
@@ -332,14 +330,14 @@ export class Scene implements IScene {
         return this
     }
 
-    getLayerByIndex(index: number): ISceneLayerHandler | null {
+    public getLayerByIndex(index: number): ISceneLayerHandler | null {
         if (index >= 0 && index < this.layers_.length) {
             return new SceneLayerHandler(this.gridSize, this.layers_[index])
         }
         return null
     }
 
-    getLayerByName(name: string): ISceneLayerHandler | null {
+    public getLayerByName(name: string): ISceneLayerHandler | null {
         return this.getLayerByIndex(
             this.layers_.findIndex(layer => layer.name === name)
         )
