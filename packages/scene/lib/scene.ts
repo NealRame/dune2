@@ -2,6 +2,7 @@ import {
     type TPoint,
     type TSize,
     Rect,
+    Size,
 } from "@nealrame/maths"
 
 import {
@@ -132,6 +133,8 @@ export class Scene implements IScene {
     private layers_: Array<TSceneLayer> = []
 
     private viewport_: Rect
+    private gridSize_: Size
+    private cellSize_: Size
 
     private sceneTickCallback_: TSceneTickCallback | null = null
     private animationCallback_ = (time: number) => {
@@ -143,8 +146,8 @@ export class Scene implements IScene {
     }
 
     private constructor(
-        private gridSize_: TSize,
-        private cellSize_: TSize,
+        gridSize: TSize,
+        cellSize: TSize,
         private canvas_: HTMLCanvasElement,
         private device_: GPUDevice,
     ) {
@@ -203,6 +206,8 @@ export class Scene implements IScene {
         this.textureFormat_ = format
 
         this.viewport_ = new Rect(0, 0, this.canvas.width, this.canvas.height)
+        this.gridSize_ = Size.FromSize(gridSize)
+        this.cellSize_ = Size.FromSize(cellSize)
     }
 
     public static async create(
@@ -254,12 +259,12 @@ export class Scene implements IScene {
         this.viewport_ = Rect.FromPointAndSize(topLeft, size)
     }
 
-    public get cellSize(): TSize {
-        return this.cellSize_
+    public get cellSize(): Size {
+        return Size.FromSize(this.cellSize_)
     }
 
-    public get gridSize(): TSize {
-        return this.gridSize_
+    public get gridSize(): Size {
+        return Size.FromSize(this.gridSize_)
     }
 
     public get size(): TSize {
@@ -350,11 +355,10 @@ export class Scene implements IScene {
             gridSize: new Float32Array(this.sceneInputsValues, 24, 2),
         }
 
-        inputsValuesViews.viewport.origin.set([this.viewport_.leftX, this.viewport_.topY])
-        inputsValuesViews.viewport.size.set([this.viewport_.width, this.viewport_.height])
-
-        inputsValuesViews.cellSize.set([this.cellSize_.width, this.cellSize_.height])
-        inputsValuesViews.gridSize.set([this.gridSize.width, this.gridSize.height])
+        inputsValuesViews.cellSize.set(this.cellSize.asArray)
+        inputsValuesViews.gridSize.set(this.gridSize.asArray)
+        inputsValuesViews.viewport.origin.set(this.viewport_.topLeft.asArray)
+        inputsValuesViews.viewport.size.set(this.viewport_.size.asArray)
 
         this.device.queue.writeBuffer(this.sceneInputsBuffer, 0, this.sceneInputsValues)
 

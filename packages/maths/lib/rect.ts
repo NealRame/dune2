@@ -5,6 +5,15 @@ import type {
     TVector,
 } from "./types"
 
+import {
+    Size,
+} from "./size"
+
+import {
+    Vector,
+} from "./vector"
+
+
 export class Rect implements TRect {
     /**
      * Creates a new `Rect` instance from the given `TRect` object.
@@ -69,15 +78,24 @@ export class Rect implements TRect {
     ) {}
 
     /**
+     * Returns the vector as an array of four numbers.
+     */
+    public get asArray(): [number, number, number, number] {
+        return [
+            this.x,
+            this.y,
+            this.width,
+            this.height,
+        ]
+    }
+
+    /**
      * Gets the size of the rectangle.
      * 
      * @returns The size of the rectangle.
      */
-    public get size(): TSize {
-        return {
-            width: this.width,
-            height: this.height,
-        }
+    public get size(): Size {
+        return new Size(this.width, this.height)
     }
 
     /**
@@ -130,11 +148,8 @@ export class Rect implements TRect {
      *
      * @returns The top-left point of the rectangle.
      */
-    public get topLeft(): TPoint {
-        return {
-            x: this.leftX,
-            y: this.topY,
-        }
+    public get topLeft(): Vector {
+        return new Vector(this.leftX, this.topY)
     }
 
     /**
@@ -142,11 +157,8 @@ export class Rect implements TRect {
      *
      * @returns The top-right point of the rectangle.
      */
-    public get topRight(): TPoint {
-        return {
-            x: this.rightX,
-            y: this.topY,
-        }
+    public get topRight(): Vector {
+        return new Vector(this.rightX, this.topY)
     }
 
     /**
@@ -154,11 +166,8 @@ export class Rect implements TRect {
      *
      * @returns The bottom-left point of the rectangle.
      */
-    public get bottomLeft(): TPoint {
-        return {
-            x: this.leftX,
-            y: this.bottomY,
-        }
+    public get bottomLeft(): Vector {
+        return new Vector(this.leftX, this.bottomY)
     }
 
     /**
@@ -166,11 +175,8 @@ export class Rect implements TRect {
      *
      * @returns The bottom-right point of the rectangle.
      */
-    public get bottomRight(): TPoint {
-        return {
-            x: this.rightX,
-            y: this.bottomY,
-        }
+    public get bottomRight(): Vector {
+        return new Vector(this.rightX, this.bottomY)
     }
 
     /**
@@ -178,11 +184,11 @@ export class Rect implements TRect {
      * 
      * @returns The center point of the rectangle.
      */
-    public get center(): TPoint {
-        return {
-            x: (this.leftX + this.rightX)/2,
-            y: (this.topY + this.bottomY)/2,
-        }
+    public get center(): Vector {
+        return new Vector(
+            (this.leftX + this.rightX)/2,
+            (this.topY + this.bottomY)/2,
+        )
     }
 
     /**

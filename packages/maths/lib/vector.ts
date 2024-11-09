@@ -166,6 +166,13 @@ export class Vector implements TVector {
     ) { }
 
     /**
+     * Returns the vector as an array of two numbers.
+     */
+    public get asArray(): [number, number] {
+        return [this.x, this.y]
+    }
+
+    /**
      * The Euclidean norm of the vector.
      *
      * @returns The Euclidean norm of the vector.
