@@ -21,15 +21,15 @@ import {
 } from "vue"
 
 import {
+    type TPoint,
     type TSize,
     Rect,
-    TPoint,
     Vector,
     clamp,
 } from "@nealrame/maths"
 
 import {
-    IScene,
+    type IScene,
     Scene,
 } from "@nealrame/scene"
 

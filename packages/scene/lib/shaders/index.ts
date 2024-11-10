@@ -1,1 +1,1 @@
-export { default as TilemapShaderSource} from "./tilemap.wgsl"
+export { default as SceneTilemapLayerShaderSource} from "./tilemap.wgsl"

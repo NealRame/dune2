@@ -3,10 +3,11 @@ import {
     type TSize,
     Rect,
     Size,
+    Vector,
 } from "@nealrame/maths"
 
 import {
-    TilemapShaderSource,
+    SceneTilemapLayerShaderSource,
 } from "./shaders"
 
 import {
@@ -16,7 +17,12 @@ import {
 } from "./types"
 
 
-type TSceneLayerConfig = {
+interface ISceneLayerConstraint<T> {}
+
+export type TSceneLayerKey<T = unknown> = symbol & ISceneLayerConstraint<T>
+
+
+export type TSceneLayerConfig = {
     name: string
     size: TSize
     textureImage: ImageBitmap
@@ -24,12 +30,16 @@ type TSceneLayerConfig = {
 }
 
 type TSceneLayer = {
-    bindGroup: GPUBindGroup
-    data: Int32Array
+    data: ArrayBuffer
     dataStorage: GPUBuffer
+    bindGroup: GPUBindGroup
+    pipeline: GPURenderPipeline
     modified: boolean
     name: string
 }
+
+export const SceneTilemapLayer: TSceneLayerKey = Symbol("Tilemap layer")
+export const SceneSpriteLayer: TSceneLayerKey = Symbol("Sprite layer")
 
 function createLayerTexture(
     device: GPUDevice,
@@ -60,13 +70,13 @@ function createLayerTexture(
 function createLayerDataStorage(
     device: GPUDevice,
     config: TSceneLayerConfig,
-): [Int32Array, GPUBuffer] {
+): [ArrayBuffer, GPUBuffer] {
     const {
         name,
         size: { width, height },
     } = config
 
-    const data = new Int32Array(height*width)
+    const data = new ArrayBuffer(4*height*width)
     const buffer = device.createBuffer({
         label: `layer ${name} - storage buffer`,
         size: data.byteLength,
@@ -103,14 +113,18 @@ function createLayerInputUniforms(
 }
 
 class SceneLayerHandler implements ISceneLayerHandler {
+    private layerDataView_: Int32Array
+
     public constructor(
         private size_: TSize,
         private layerData_: TSceneLayer,
-    ) { }
+    ) {
+        this.layerDataView_ = new Int32Array(this.layerData_.data)
+    }
 
     public set(pos: TPoint, v: number): this {
         const index = this.size_.width*pos.y + pos.x
-        this.layerData_.data[index] = v
+        this.layerDataView_[index] = v
         this.layerData_.modified = true
         return this
     }
@@ -118,7 +132,8 @@ class SceneLayerHandler implements ISceneLayerHandler {
 
 export class Scene implements IScene {
     private context_: GPUCanvasContext
-    private pipeline_: GPURenderPipeline
+    // private pipeline_: GPURenderPipeline
+    private pipelines_: Record<symbol, GPURenderPipeline>
     private textureFormat_: GPUTextureFormat
     private sampler_: GPUSampler
 
@@ -143,33 +158,17 @@ export class Scene implements IScene {
         }
     }
 
-    private constructor(
-        gridSize: TSize,
-        cellSize: TSize,
-        private canvas_: HTMLCanvasElement,
-        private device_: GPUDevice,
-    ) {
-        const format = navigator.gpu.getPreferredCanvasFormat()
-        const context = this.canvas_.getContext("webgpu")
-
-        const module = this.device_.createShaderModule({
-            label: "Scene shader",
-            code: TilemapShaderSource,
+    private createPipeline_(
+        code: string,
+        label: string,
+    ): GPURenderPipeline {
+        const module = this.device.createShaderModule({
+            label: `${label} - Shader`,
+            code,
         })
 
-        if (context == null) {
-            throw new Error("Failed to get a webgpu context!")
-        } else {
-            context.configure({
-                device: this.device_,
-                format,
-            })
-        }
-
-        this.context_ = context
-
-        this.pipeline_ = this.device_.createRenderPipeline({
-            label: "Scene pipeline",
+        return this.device.createRenderPipeline({
+            label: `${label} - Pipeline`,
             layout: "auto",
             vertex: {
                 entryPoint: "vertex_shader",
@@ -179,7 +178,7 @@ export class Scene implements IScene {
                 entryPoint: "fragment_shader",
                 module,
                 targets: [{
-                    format,
+                    format: this.textureFormat_,
                     blend: {
                         alpha: { },
                         color: {
@@ -191,6 +190,35 @@ export class Scene implements IScene {
                 }],
             },
         })
+    }
+    
+    private constructor(
+        gridSize: TSize,
+        cellSize: TSize,
+        private canvas_: HTMLCanvasElement,
+        private device_: GPUDevice,
+    ) {
+        const format = navigator.gpu.getPreferredCanvasFormat()
+        const context = this.canvas_.getContext("webgpu")
+
+        if (context == null) {
+            throw new Error("Failed to get a webgpu context!")
+        } else {
+            context.configure({
+                device: this.device_,
+                format,
+            })
+        }
+
+        this.context_ = context
+        this.textureFormat_ = format
+
+        this.pipelines_ = {
+            [SceneTilemapLayer]: this.createPipeline_(
+                SceneTilemapLayerShaderSource,
+                SceneTilemapLayer.description ?? "",
+            )
+        }
 
         this.sampler_ = this.device_.createSampler()
 
@@ -201,9 +229,7 @@ export class Scene implements IScene {
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         })
 
-        this.textureFormat_ = format
-
-        this.viewport_ = new Rect(0, 0, this.canvas.width, this.canvas.height)
+        this.viewport_ = Rect.FromSize(this.canvas)
         this.gridSize_ = Size.FromSize(gridSize)
         this.cellSize_ = Size.FromSize(cellSize)
     }
@@ -292,13 +318,15 @@ export class Scene implements IScene {
             textureTileSize,
         }
 
+        const pipeline = this.pipelines_[SceneTilemapLayer]
+        
         const [layerData, layerDataStorage] = createLayerDataStorage(this.device, config)
         const layerInputsBuffer = createLayerInputUniforms(this.device, config)
         const texture = createLayerTexture(this.device, config)
 
         const bindGroup = this.device.createBindGroup({
             label: `layer ${name} - bind group`,
-            layout: this.pipeline_.getBindGroupLayout(0),
+            layout: pipeline.getBindGroupLayout(0),
             entries: [{
                 binding: 0,
                 resource: { buffer: this.sceneInputsBuffer },
@@ -318,9 +346,10 @@ export class Scene implements IScene {
         })
 
         const layer: TSceneLayer = {
-            bindGroup,
             data: layerData,
             dataStorage: layerDataStorage,
+            bindGroup,
+            pipeline,
             modified: false,
             name,
         }
@@ -345,12 +374,12 @@ export class Scene implements IScene {
 
     public render() {
         const inputsValuesViews = {
+            cellSize: new Float32Array(this.sceneInputsValues, 0, 2),
+            gridSize: new Float32Array(this.sceneInputsValues, 8, 2),
             viewport: {
-                origin: new Float32Array(this.sceneInputsValues, 0, 2),
-                size: new Float32Array(this.sceneInputsValues, 8, 2),
+                origin: new Float32Array(this.sceneInputsValues, 16, 2),
+                size: new Float32Array(this.sceneInputsValues, 24, 2),
             },
-            cellSize: new Float32Array(this.sceneInputsValues, 16, 2),
-            gridSize: new Float32Array(this.sceneInputsValues, 24, 2),
         }
 
         inputsValuesViews.cellSize.set(this.cellSize.asArray)
@@ -378,10 +407,7 @@ export class Scene implements IScene {
                 this.device.queue.writeBuffer(layer.dataStorage, 0, layer.data)
                 layer.modified = false
             }
-        }
-
-        for (const layer of this.layers_) {
-            pass.setPipeline(this.pipeline_)
+            pass.setPipeline(layer.pipeline)
             pass.setBindGroup(0, layer.bindGroup)
             pass.draw(6, this.gridSize.width*this.gridSize.height)
         }

@@ -4,9 +4,9 @@ struct Viewport {
 };
 
 struct SceneInputs {
-    viewport: Viewport,
     cell_size: vec2f,
     grid_size: vec2f,
+    viewport: Viewport,
 };
 
 struct LayerInputs {
