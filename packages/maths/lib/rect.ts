@@ -26,6 +26,17 @@ export class Rect implements TRect {
     }
 
     /**
+     * Creates a new `Rect` instance from given `TSize` objects. Top left point
+     * will have coordinates (x=0, y=0).
+     *
+     * @param size - A `TSize` like object.
+     * @returns A new `Rect`.
+     */
+    public static FromSize(size: TSize): Rect {
+        return new Rect(0, 0, size.width, size.height)
+    }    
+    
+    /**
      * Creates a new `Rect` instance from given `TPoint` and `TSize` objects.
      *
      * @param topLeft - A `TPoint` like object.
