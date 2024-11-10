@@ -3,7 +3,6 @@ import {
     type TSize,
     Rect,
     Size,
-    Vector,
 } from "@nealrame/maths"
 
 import {
@@ -38,8 +37,13 @@ type TSceneLayer = {
     name: string
 }
 
-export const SceneTilemapLayer: TSceneLayerKey = Symbol("Tilemap layer")
+export const SceneTilemapLayer: TSceneLayerKey = Symbol()
 export const SceneSpriteLayer: TSceneLayerKey = Symbol("Sprite layer")
+
+const SceneLayerShaderSources = [
+    [SceneTilemapLayer, SceneTilemapLayerShaderSource, "Tilemap layer"],
+    // [SceneSpriteLayer,  SceneSpriteLayerShaderSource,  "Sprite layer"],
+] as const
 
 function createLayerTexture(
     device: GPUDevice,
@@ -213,12 +217,12 @@ export class Scene implements IScene {
         this.context_ = context
         this.textureFormat_ = format
 
-        this.pipelines_ = {
-            [SceneTilemapLayer]: this.createPipeline_(
-                SceneTilemapLayerShaderSource,
-                SceneTilemapLayer.description ?? "",
-            )
-        }
+        this.pipelines_ = Object.assign(
+            { },
+            ...SceneLayerShaderSources.map(([key, code, label]) => [{
+                [key]: this.createPipeline_(code, label)
+            }]),
+        )
 
         this.sampler_ = this.device_.createSampler()
 
