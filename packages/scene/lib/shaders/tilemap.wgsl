@@ -37,7 +37,7 @@ fn vertex_coordinates(
         f32(instance_index)%grid_size.x,
         floor(f32(instance_index)/grid_size.x),
     );
-    cell_xy += position;            // cell corner coordinates
+    cell_xy += position/2;        // cell corner coordinates
     cell_xy *= cell_size;         // >-> [ 0..cell_size*grid_size]
     cell_xy -= viewport_origin;
     cell_xy /= viewport_size;     // >-> [ 0..1]
@@ -60,7 +60,7 @@ fn texture_coordinates(
         tex_index%16,
         tex_index/16,
     ));
-    tex_xy += position;             // cell corner coordinates
+    tex_xy += (position + 1)/2;             // cell corner coordinates
     tex_xy *= tex_tile_size;      // >-> [0..tex_size]
     tex_xy /= tex_size;           // >-> [0..1]
 
@@ -80,13 +80,13 @@ fn vertex_shader(
 
     let positions = array(
         // first triangle
-        vec2f(0, 0),              // (0, 0) +---+ (1, 0)
-        vec2f(1, 0),              //        | /
-        vec2f(0, 1),              // (0, 1) +
+        vec2f(-1, -1),              // (-1, -1) +--+ ( 1, -1)
+        vec2f( 1, -1),              //          | /
+        vec2f(-1,  1),              // (-1,  1) +
         // second triangle
-        vec2f(1, 1),              //            + (1, 0)
-        vec2f(0, 1),              //          / |
-        vec2f(1, 0),              // (0, 1) +---+ (1, 1)
+        vec2f( 1, -1),              //             + ( 1, -1)
+        vec2f( 1,  1),              //           / |
+        vec2f(-1,  1),              // (-1,  1) +--+ ( 1,  1)
     ); // two triangles to make a rectangle
     let position = positions[vertex_index];
 
