@@ -219,9 +219,9 @@ export class Scene implements IScene {
 
         this.pipelines_ = Object.assign(
             { },
-            ...SceneLayerShaderSources.map(([key, code, label]) => [{
+            ...SceneLayerShaderSources.map(([key, code, label]) => ({
                 [key]: this.createPipeline_(code, label)
-            }]),
+            })),
         )
 
         this.sampler_ = this.device_.createSampler()
@@ -321,13 +321,13 @@ export class Scene implements IScene {
             textureImage,
             textureTileSize,
         }
-
+        
         const pipeline = this.pipelines_[SceneTilemapLayer]
         
         const [layerData, layerDataStorage] = createLayerDataStorage(this.device, config)
         const layerInputsBuffer = createLayerInputUniforms(this.device, config)
         const texture = createLayerTexture(this.device, config)
-
+        
         const bindGroup = this.device.createBindGroup({
             label: `layer ${name} - bind group`,
             layout: pipeline.getBindGroupLayout(0),
