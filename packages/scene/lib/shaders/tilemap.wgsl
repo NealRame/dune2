@@ -60,7 +60,7 @@ fn texture_coordinates(
         tex_index%16,
         tex_index/16,
     ));
-    tex_xy += (position + 1)/2;             // cell corner coordinates
+    tex_xy += (position + 1)/2;   // cell corner coordinates
     tex_xy *= tex_tile_size;      // >-> [0..tex_size]
     tex_xy /= tex_size;           // >-> [0..1]
 
