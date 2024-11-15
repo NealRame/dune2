@@ -7,7 +7,7 @@ import {
 } from "@nealrame/maths"
 
 import {
-    ISceneLayerHandler,
+    ISceneTilemapLayerHandler,
     type IScene,
 } from "@nealrame/scene"
 
@@ -151,7 +151,7 @@ export class Dune2Map {
         }, terrains)
     }
 
-    public render: (layer: ISceneLayerHandler) => Dune2Map
+    public render: (layer: ISceneTilemapLayerHandler) => Dune2Map
 
     public constructor(
         private size_: TSize,

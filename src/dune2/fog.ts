@@ -4,7 +4,7 @@ import {
 } from "@nealrame/maths"
 
 import {
-    type ISceneLayerHandler,
+    type ISceneTilemapLayerHandler,
 } from "@nealrame/scene"
 
 
@@ -48,7 +48,7 @@ export class Dune2FogOfWar {
         return this
     }
 
-    public render(layer: ISceneLayerHandler): this {
+    public render(layer: ISceneTilemapLayerHandler): this {
         for (let y = 0; y < this.height; ++y) {
         for (let x = 0; x < this.width; ++x) {
             const pos = {x, y}

@@ -7,46 +7,65 @@ import {
 
 import {
     SceneTilemapLayerShaderSource,
+    SceneSpriteLayerShaderSource,
 } from "./shaders"
 
-import {
-    type IScene,
-    type ISceneLayerHandler,
-    type TSceneTickCallback,
+import type {
+    IScene,
+    ISceneLayer,
+    ISceneSpriteLayer,
+    ISceneTilemapLayer,
+    TSceneTickCallback,
+    TSceneLayerConfig,
+    TSceneLayerItem,
+    TSceneLayerId,
+    TSceneLayerReq,
 } from "./types"
 
 
-interface ISceneLayerConstraint<T> {}
-
-export type TSceneLayerKey<T = unknown> = symbol & ISceneLayerConstraint<T>
-
-
-export type TSceneLayerConfig = {
-    name: string
-    size: TSize
-    textureImage: ImageBitmap
-    textureTileSize: TSize
+function defineLayerKey<T extends ISceneLayer>(): TSceneLayerReq<T> {
+    return Symbol() as TSceneLayerReq<T>
 }
 
-type TSceneLayer = {
-    data: ArrayBuffer
-    dataStorage: GPUBuffer
-    bindGroup: GPUBindGroup
-    pipeline: GPURenderPipeline
-    modified: boolean
-    name: string
+export const SceneSpriteLayer = defineLayerKey<ISceneSpriteLayer>()
+export const SceneTilemapLayer = defineLayerKey<ISceneTilemapLayer>()
+
+function createPipeline(
+    layer: ISceneLayer,
+    code: string,
+): GPURenderPipeline {
+    const module = layer.scene.device.createShaderModule({
+        label: `${layer.name} - Shader`,
+        code,
+    })
+
+    return layer.scene.device.createRenderPipeline({
+        label: `${layer.name} - Pipeline`,
+        layout: "auto",
+        vertex: {
+            entryPoint: "vertex_shader",
+            module,
+        },
+        fragment: {
+            entryPoint: "fragment_shader",
+            module,
+            targets: [{
+                format: layer.scene.textureFormat,
+                blend: {
+                    alpha: { },
+                    color: {
+                        operation: "add",
+                        srcFactor: "one",
+                        dstFactor: "one-minus-src-alpha"
+                    },
+                },
+            }],
+        },
+    })
 }
-
-export const SceneTilemapLayer: TSceneLayerKey = Symbol()
-export const SceneSpriteLayer: TSceneLayerKey = Symbol("Sprite layer")
-
-const SceneLayerShaderSources = [
-    [SceneTilemapLayer, SceneTilemapLayerShaderSource, "Tilemap layer"],
-    // [SceneSpriteLayer,  SceneSpriteLayerShaderSource,  "Sprite layer"],
-] as const
 
 function createLayerTexture(
-    device: GPUDevice,
+    scene: IScene,
     config: TSceneLayerConfig,
 ): GPUTexture {
     const {
@@ -54,7 +73,7 @@ function createLayerTexture(
         textureImage,
     } = config
     const { width, height } = textureImage
-    const texture = device.createTexture({
+    const texture = scene.device.createTexture({
         label: `layer ${name} - texture`,
         size: [width, height],
         format: "rgba8unorm",
@@ -63,7 +82,7 @@ function createLayerTexture(
             | GPUTextureUsage.RENDER_ATTACHMENT,
     })
 
-    device.queue.copyExternalImageToTexture(
+    scene.device.queue.copyExternalImageToTexture(
         { source: textureImage },
         { texture },
         { width, height },
@@ -71,27 +90,8 @@ function createLayerTexture(
     return texture
 }
 
-function createLayerDataStorage(
-    device: GPUDevice,
-    config: TSceneLayerConfig,
-): [ArrayBuffer, GPUBuffer] {
-    const {
-        name,
-        size: { width, height },
-    } = config
-
-    const data = new ArrayBuffer(4*height*width)
-    const buffer = device.createBuffer({
-        label: `layer ${name} - storage buffer`,
-        size: data.byteLength,
-        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
-    })
-
-    return [data, buffer]
-}
-
-function createLayerInputUniforms(
-    device: GPUDevice,
+function createLayerUniforms(
+    scene: IScene,
     config: TSceneLayerConfig,
 ): GPUBuffer {
     const {
@@ -101,7 +101,7 @@ function createLayerInputUniforms(
     const { width, height } = textureTileSize
 
     const values = new ArrayBuffer(8)
-    const buffer = device.createBuffer({
+    const buffer = scene.device.createBuffer({
         label: `layer ${name} - input uniforms`,
         size: values.byteLength,
         usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
@@ -112,42 +112,314 @@ function createLayerInputUniforms(
     }
 
     views.textureTileSize.set([width, height])
-    device.queue.writeBuffer(buffer, 0, values)
+    scene.device.queue.writeBuffer(buffer, 0, values)
     return buffer
 }
 
-class SceneLayerHandler implements ISceneLayerHandler {
-    private layerDataView_: Int32Array
+function createLayerBindGroup(
+    layer: ISceneLayer,
+): GPUBindGroup {
+    return layer.scene.device.createBindGroup({
+        label: `${layer.fullname} - bind group`,
+        layout: layer.pipeline.getBindGroupLayout(0),
+        entries: [{
+            binding: 0,
+            resource: { buffer: layer.scene.uniforms },
+        }, {
+            binding: 1,
+            resource: { buffer: layer.uniforms},
+        }, {
+            binding: 2,
+            resource: { buffer: layer.dataStorage },
+        }, {
+            binding: 3,
+            resource: layer.scene.device.createSampler(),
+        }, {
+            binding: 4,
+            resource: layer.texture.createView(),
+        }],
+    })
+}
 
-    public constructor(
-        private size_: TSize,
-        private layerData_: TSceneLayer,
-    ) {
-        this.layerDataView_ = new Int32Array(this.layerData_.data)
+///////////////////////////////////////////////////////////////////////////////
+// Scene Tilemap Layer ////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+function createTilemapLayerDataStorage(
+    scene: IScene,
+    config: TSceneLayerConfig,
+): [ArrayBuffer, GPUBuffer] {
+    const {
+        name,
+    } = config
+    const { width, height } = scene.gridSize
+
+    const data = new ArrayBuffer(4*height*width)
+    const buffer = scene.device.createBuffer({
+        label: `layer Tilemap[${name}] - storage buffer`,
+        size: data.byteLength,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+    })
+
+    return [data, buffer]
+}
+
+class SceneTilemapLayerImpl implements ISceneTilemapLayer {
+    private name_: string
+    private modified_: boolean
+    private data_: ArrayBuffer
+    private dataView_: Int32Array
+    private dataStorage_: GPUBuffer
+    private uniforms_: GPUBuffer
+    private texture_: GPUTexture
+    private pipeline_: GPURenderPipeline
+    private bindGroup_: GPUBindGroup
+
+    private getTileIndex_(position: TPoint): number {
+        return this.scene_.gridSize.width*position.y + position.x
     }
 
-    public set(pos: TPoint, v: number): this {
-        const index = this.size_.width*pos.y + pos.x
-        this.layerDataView_[index] = v
-        this.layerData_.modified = true
+    public constructor(
+        private id_: TSceneLayerId<ISceneTilemapLayer>,
+        private scene_: IScene,
+        config: TSceneLayerConfig,
+    ) {
+        const [data, dataStorage] = createTilemapLayerDataStorage(this.scene_, config)
+        const uniforms = createLayerUniforms(this.scene_, config)
+        const texture = createLayerTexture(this.scene_, config)
+
+        this.name_ = config.name
+        this.modified_ = false
+
+        this.data_ = data
+        this.dataView_ = new Int32Array(data)
+        this.dataStorage_ = dataStorage
+        this.uniforms_ = uniforms
+        this.texture_ = texture
+
+        this.pipeline_ = createPipeline(this, SceneTilemapLayerShaderSource)
+        this.bindGroup_ = createLayerBindGroup(this)
+    }
+
+    public get id(): TSceneLayerId<ISceneTilemapLayer> {
+        return this.id_
+    }
+    
+    public get scene(): IScene {
+        return this.scene_
+    }
+    
+    public get name(): string {
+        return this.name_
+    }
+
+    public get fullname(): string {
+        return `layer Tilemap[${this.name_}]`
+    }
+
+    public get itemCount(): number {
+        return this.scene_.gridSize.width*this.scene_.gridSize.height
+    }
+
+    public get modified(): boolean {
+        return this.modified_
+    }
+
+    public get data(): ArrayBuffer {
+        return this.data_
+    }
+    
+    public get dataStorage(): GPUBuffer {
+        return this.dataStorage_
+    }
+
+    public get uniforms(): GPUBuffer {
+        return this.uniforms_
+    }
+
+    public get texture(): GPUTexture {
+        return this.texture_
+    }
+
+    public get bindGroup(): GPUBindGroup {
+        return this.bindGroup_
+    }
+
+    public get pipeline(): GPURenderPipeline {
+        return this.pipeline_
+    }
+
+    public clean(): this {
+        this.modified_ = false
+        return this
+    }
+
+    public clear(): this {
+        this.dataView_.fill(-1)
+        this.modified_ = true
+        return this
+    }
+
+    public set(tile: TSceneLayerItem): this {
+        const tileIndex = this.getTileIndex_(tile.position)
+        this.dataView_[tileIndex] = tile.textureIndex
+        this.modified_ = true
+        return this
+    }
+
+    public unset(tile: TSceneLayerItem): this {
+        const tileIndex = this.getTileIndex_(tile.position)
+        this.dataView_[tileIndex] = -1
+        this.modified_ = true
+        return this
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Scene Sprite Layer /////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+const kSceneSpriteLayerItemSize = 16
+const kSceneSpriteLayerItemMaxCount = 2**16
+const kSceneSpriteLayerDataByteSize = kSceneSpriteLayerItemSize*kSceneSpriteLayerItemMaxCount
+
+function createSpriteLayerDataStorage(
+    scene: IScene,
+    config: TSceneLayerConfig,
+): [ArrayBuffer, GPUBuffer] {
+    const {
+        name,
+    } = config
+
+    const data = new ArrayBuffer(kSceneSpriteLayerDataByteSize)
+    const buffer = scene.device.createBuffer({
+        label: `layer Sprite[${name}] - layer data storage buffer`,
+        size: data.byteLength,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+    })
+
+    return [data, buffer]
+}
+
+class SceneSpriteLayerImpl implements ISceneSpriteLayer {
+    private name_: string
+    private data_: ArrayBuffer
+    private dataStorage_: GPUBuffer
+    private uniforms_: GPUBuffer
+    private texture_: GPUTexture
+    private pipeline_: GPURenderPipeline
+    private bindGroup_: GPUBindGroup
+
+    private modified_ = false
+    private itemsCount_ = 0
+    
+    public constructor(
+        private id_: TSceneLayerId<ISceneSpriteLayer>,
+        private scene_: IScene,
+        config: TSceneLayerConfig,
+    ) {
+        const [data, dataStorage] = createSpriteLayerDataStorage(this.scene_, config)
+        const uniforms = createLayerUniforms(this.scene_, config)
+        const texture = createLayerTexture(this.scene_, config)
+
+        this.name_ = config.name
+
+        this.data_ = data
+        this.dataStorage_ = dataStorage
+        this.uniforms_ = uniforms
+        this.texture_ = texture
+
+        this.pipeline_ = createPipeline(this, SceneSpriteLayerShaderSource)
+        this.bindGroup_ = createLayerBindGroup(this)
+    }
+
+    public get id(): TSceneLayerId<ISceneSpriteLayer> {
+        return this.id_
+    }
+
+    public get scene(): IScene {
+        return this.scene_
+    }
+
+    public get name(): string {
+        return this.name_
+    }
+    
+    public get fullname(): string {
+        return `layer Sprite[${this.name_}]`
+    }
+
+    public get modified(): boolean {
+        return this.modified_
+    }
+    
+    public get itemCount(): number {
+        return this.itemsCount_
+    }
+    
+    public get data(): ArrayBuffer {
+        return this.data_
+    }
+    
+    public get dataStorage(): GPUBuffer {
+        return this.dataStorage_
+    }
+
+    public get uniforms(): GPUBuffer {
+        return this.uniforms_
+    }
+    
+    public get texture(): GPUTexture {
+        return this.texture_
+    }
+
+    public get bindGroup(): GPUBindGroup {
+        return this.bindGroup_
+    }
+
+    public get pipeline(): GPURenderPipeline {
+        return this.pipeline_
+    }
+
+    public clean(): this {
+        this.modified_ = false
+        return this
+    }
+
+    public clear(): this {
+        this.itemsCount_ = 0
+        this.modified_ = true
+        return this
+    }
+
+    public push(sprite: TSceneLayerItem): this {
+        if (this.itemsCount_ < kSceneSpriteLayerItemMaxCount) {
+            const itemDataOffset = this.itemsCount_*kSceneSpriteLayerItemSize
+            const itemDataView = {
+                textureIndex: new Int32Array(this.data_, itemDataOffset + 0, 1),
+                position: new Float32Array(this.data_, itemDataOffset + 8, 2),
+            }
+
+            itemDataView.textureIndex.set([sprite.textureIndex])
+            itemDataView.position.set([sprite.position.x, sprite.position.y])
+
+            this.itemsCount_ =+ 1
+        }
         return this
     }
 }
 
 export class Scene implements IScene {
     private context_: GPUCanvasContext
-    // private pipeline_: GPURenderPipeline
-    private pipelines_: Record<symbol, GPURenderPipeline>
     private textureFormat_: GPUTextureFormat
-    private sampler_: GPUSampler
 
-    private sceneInputsValues: ArrayBuffer
-    private sceneInputsBuffer: GPUBuffer
+    private uniformsValues_: ArrayBuffer
+    private uniforms_: GPUBuffer
 
     private animationRequestID_: number | null = null
     private running_ = false
 
-    private layers_: Array<TSceneLayer> = []
+    private layers_: Map<TSceneLayerId, ISceneLayer> = new Map()
 
     private viewport_: Rect
     private gridSize_: Size
@@ -160,40 +432,6 @@ export class Scene implements IScene {
             this.render()
             this.animationRequestID_ = window.requestAnimationFrame(this.animationCallback_)
         }
-    }
-
-    private createPipeline_(
-        code: string,
-        label: string,
-    ): GPURenderPipeline {
-        const module = this.device.createShaderModule({
-            label: `${label} - Shader`,
-            code,
-        })
-
-        return this.device.createRenderPipeline({
-            label: `${label} - Pipeline`,
-            layout: "auto",
-            vertex: {
-                entryPoint: "vertex_shader",
-                module,
-            },
-            fragment: {
-                entryPoint: "fragment_shader",
-                module,
-                targets: [{
-                    format: this.textureFormat_,
-                    blend: {
-                        alpha: { },
-                        color: {
-                            operation: "add",
-                            srcFactor: "one",
-                            dstFactor: "one-minus-src-alpha"
-                        },
-                    },
-                }],
-            },
-        })
     }
     
     private constructor(
@@ -217,19 +455,10 @@ export class Scene implements IScene {
         this.context_ = context
         this.textureFormat_ = format
 
-        this.pipelines_ = Object.assign(
-            { },
-            ...SceneLayerShaderSources.map(([key, code, label]) => ({
-                [key]: this.createPipeline_(code, label)
-            })),
-        )
-
-        this.sampler_ = this.device_.createSampler()
-
-        this.sceneInputsValues = new ArrayBuffer(32)
-        this.sceneInputsBuffer = this.device_.createBuffer({
+        this.uniformsValues_ = new ArrayBuffer(32)
+        this.uniforms_ = this.device_.createBuffer({
             label: "scene - VS Uniform Buffer",
-            size: this.sceneInputsValues.byteLength,
+            size: this.uniformsValues_.byteLength,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         })
 
@@ -302,96 +531,68 @@ export class Scene implements IScene {
         }
     }
 
+    public get uniforms() {
+        return this.uniforms_
+    }
+    
     public get textureFormat() {
         return this.textureFormat_
     }
 
-    public addLayer(
-        name: string,
-        textureImage: ImageBitmap,
-        textureTileSize: TSize,
-    ): IScene {
-        if (this.getLayerByName(name) != null) {
-            throw new Error(`layer '${name}' already exists!`)
-        }
+    public addLayer<T extends ISceneLayer>(
+        layerReq: TSceneLayerReq<T>,
+        config: TSceneLayerConfig,
+    ): T | null {
+        if (layerReq === SceneSpriteLayer) {
+            const id = defineLayerKey<ISceneSpriteLayer>()
+            const layer = new SceneSpriteLayerImpl(id, this, config)
 
-        const config: TSceneLayerConfig = {
-            name,
-            size: this.gridSize,
-            textureImage,
-            textureTileSize,
+            this.layers_.set(id, layer)
+
+            return layer as unknown as T
         }
         
-        const pipeline = this.pipelines_[SceneTilemapLayer]
-        
-        const [layerData, layerDataStorage] = createLayerDataStorage(this.device, config)
-        const layerInputsBuffer = createLayerInputUniforms(this.device, config)
-        const texture = createLayerTexture(this.device, config)
-        
-        const bindGroup = this.device.createBindGroup({
-            label: `layer ${name} - bind group`,
-            layout: pipeline.getBindGroupLayout(0),
-            entries: [{
-                binding: 0,
-                resource: { buffer: this.sceneInputsBuffer },
-            }, {
-                binding: 1,
-                resource: { buffer: layerInputsBuffer},
-            }, {
-                binding: 2,
-                resource: { buffer: layerDataStorage },
-            }, {
-                binding: 3,
-                resource: this.sampler_,
-            }, {
-                binding: 4,
-                resource: texture.createView(),
-            }],
-        })
+        if (layerReq === SceneTilemapLayer) {
+            const id = defineLayerKey<ISceneSpriteLayer>()
+            const layer = new SceneTilemapLayerImpl(id, this, config)
 
-        const layer: TSceneLayer = {
-            data: layerData,
-            dataStorage: layerDataStorage,
-            bindGroup,
-            pipeline,
-            modified: false,
-            name,
+            this.layers_.set(id, layer)
+
+            return layer as unknown as T
         }
-
-        this.layers_.push(layer)
-
-        return this
-    }
-
-    public getLayerByIndex(index: number): ISceneLayerHandler | null {
-        if (index >= 0 && index < this.layers_.length) {
-            return new SceneLayerHandler(this.gridSize, this.layers_[index])
-        }
+        
         return null
     }
 
-    public getLayerByName(name: string): ISceneLayerHandler | null {
-        return this.getLayerByIndex(
-            this.layers_.findIndex(layer => layer.name === name)
-        )
+    public getLayer<T extends ISceneLayer>(
+        layerId: TSceneLayerId<T>,
+    ): T | null {
+        return this.layers_.get(layerId) as T ?? null
+    }
+    
+    public delLayer<T extends ISceneLayer>(
+        layerId: TSceneLayerId<T>,
+    ): this {
+        this.layers_.delete(layerId)
+        return this
     }
 
-    public render() {
-        const inputsValuesViews = {
-            cellSize: new Float32Array(this.sceneInputsValues, 0, 2),
-            gridSize: new Float32Array(this.sceneInputsValues, 8, 2),
+    public render(): this {
+        const uniformsView = {
+            cellSize: new Float32Array(this.uniformsValues_, 0, 2),
+            gridSize: new Float32Array(this.uniformsValues_, 8, 2),
             viewport: {
-                origin: new Float32Array(this.sceneInputsValues, 16, 2),
-                size: new Float32Array(this.sceneInputsValues, 24, 2),
+                origin: new Float32Array(this.uniformsValues_, 16, 2),
+                size: new Float32Array(this.uniformsValues_, 24, 2),
             },
         }
 
-        inputsValuesViews.cellSize.set(this.cellSize.asArray)
-        inputsValuesViews.gridSize.set(this.gridSize.asArray)
-        inputsValuesViews.viewport.origin.set(this.viewport_.topLeft.asArray)
-        inputsValuesViews.viewport.size.set(this.viewport_.size.asArray)
+        uniformsView.cellSize.set(this.cellSize.asArray)
+        uniformsView.gridSize.set(this.gridSize.asArray)
+        uniformsView.viewport.origin.set(this.viewport_.topLeft.asArray)
+        uniformsView.viewport.size.set(this.viewport_.size.asArray)
 
-        this.device.queue.writeBuffer(this.sceneInputsBuffer, 0, this.sceneInputsValues)
+        this.device.queue.writeBuffer(this.uniforms_, 0, this.uniformsValues_)
 
         const encoder = this.device.createCommandEncoder({
             label: "scene - command encoder",
@@ -405,36 +606,41 @@ export class Scene implements IScene {
                 storeOp: "store",
             }],
         })
-
-        for (const layer of this.layers_) {
+        
+        for (const layer of this.layers_.values()) {
             if (layer.modified) {
                 this.device.queue.writeBuffer(layer.dataStorage, 0, layer.data)
-                layer.modified = false
+                layer.clean()
             }
+
             pass.setPipeline(layer.pipeline)
             pass.setBindGroup(0, layer.bindGroup)
-            pass.draw(6, this.gridSize.width*this.gridSize.height)
+            pass.draw(6, layer.itemCount)
         }
 
         pass.end()
 
         this.device_.queue.submit([encoder.finish()])
+        
+        return this
     }
 
-    public start(tickCallback?: TSceneTickCallback) {
+    public start(tickCallback?: TSceneTickCallback): this {
         if (!this.running_) {
             this.running_ = true
             this.sceneTickCallback_ = tickCallback ?? null
             this.animationRequestID_ =
                 window.requestAnimationFrame(this.animationCallback_)
         }
+        return this
     }
 
-    public stop() {
+    public stop(): this {
         if (this.running_) {
             this.running_ = false
             this.sceneTickCallback_ = null
             window.cancelAnimationFrame(this.animationRequestID_!)
         }
+        return this
     }
 }

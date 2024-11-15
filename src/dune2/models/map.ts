@@ -15,16 +15,16 @@ import type {
 
 export class Dune2MapSizeConfigModel implements TDune2MapGeneratorSizeConfig {
     @range({
-        min: 8,
+        min: 1,
         max: 256,
         step: 1,
-    }) public width = 64
+    }) public width = 3
 
     @range({
-        min: 8,
+        min: 1,
         max: 256,
         step: 1,
-    }) public height = 64
+    }) public height = 2
 
     clone() {
         const size = new Dune2MapSizeConfigModel()

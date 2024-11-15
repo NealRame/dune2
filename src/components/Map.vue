@@ -31,6 +31,7 @@ import {
 import {
     type IScene,
     Scene,
+    SceneTilemapLayer,
 } from "@nealrame/scene"
 
 import {
@@ -76,7 +77,7 @@ const {
 } = storeToRefs(useDune2GameResources())
 
 const showSettings = ref(true)
-const scale = ref(1)
+const scale = ref(4)
 
 const dune2MapSizeConfig = ref(new Dune2MapSizeConfigModel())
 const dune2MapTerrainConfig = ref(new Dune2MapTerrainConfigModel())
@@ -159,9 +160,13 @@ async function updateScene() {
         {...dune2MapSizeConfig.value},
         canvas.value,
     )
-    scene.addLayer("land", textureImage, textureTileSize)
 
-    const layer = scene.getLayerByName("land")
+    const layer = scene.addLayer(SceneTilemapLayer, {
+        name: "land",
+        textureImage,
+        textureTileSize,
+    })
+
     const dune2Map = Dune2Map.generate(dune2MapConfig)
 
     dune2Map.render(layer!)

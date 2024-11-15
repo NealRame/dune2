@@ -1,5 +1,5 @@
 import {
-    type ISceneLayerHandler,
+    type ISceneTilemapLayerHandler,
 } from "@nealrame/scene"
 
 import {
@@ -84,38 +84,42 @@ function renderSpice(
 
 export function render(
     this: Dune2Map,
-    layer: ISceneLayerHandler,
+    layer: ISceneTilemapLayerHandler,
 ): Dune2Map {
     for (let y = 0; y < this.height; ++y) {
     for (let x = 0; x < this.width; ++x) {
-        const pos = {x, y}
-        const terrain = this.terrainAt(pos)
-        const neighborhood = this.neighborhoodAt(pos, terrain)
+        const position = {x, y}
+        const terrain = this.terrainAt(position)
+        const neighborhood = this.neighborhoodAt(position, terrain)
+
+        let textureIndex = -1
 
         switch (terrain.type) {
         case Dune2TerrainType.Sand:
-            layer.set(pos, 0)
+            textureIndex = 0
             break
 
         case Dune2TerrainType.Spice:
-            layer.set(pos, renderSpice(terrain.spice, neighborhood))
+            textureIndex = renderSpice(terrain.spice, neighborhood)
             break
 
         case Dune2TerrainType.Dunes:
-            layer.set(pos, renderDunes(neighborhood))
+            textureIndex = renderDunes(neighborhood)
             break
 
         case Dune2TerrainType.Mountain:
-            layer.set(pos, renderMountain(neighborhood))
+            textureIndex = renderMountain(neighborhood)
             break
 
         case Dune2TerrainType.Rock:
-            layer.set(pos, renderRock(neighborhood))
+            textureIndex = renderRock(neighborhood)
             break
 
         default:
             break
         }
+        
+        layer.set({ position, textureIndex })
     }}
 
     return this
