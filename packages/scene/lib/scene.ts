@@ -165,8 +165,9 @@ function createTilemapLayerDataStorage(
 }
 
 class SceneTilemapLayerImpl implements ISceneTilemapLayer {
+    private modified_ = false
+
     private name_: string
-    private modified_: boolean
     private data_: ArrayBuffer
     private dataView_: Int32Array
     private dataStorage_: GPUBuffer
@@ -189,7 +190,6 @@ class SceneTilemapLayerImpl implements ISceneTilemapLayer {
         const texture = createLayerTexture(this.scene_, config)
 
         this.name_ = config.name
-        this.modified_ = false
 
         this.data_ = data
         this.dataView_ = new Int32Array(data)
@@ -302,6 +302,9 @@ function createSpriteLayerDataStorage(
 }
 
 class SceneSpriteLayerImpl implements ISceneSpriteLayer {
+    private modified_ = false
+    private itemsCount_ = 0
+
     private name_: string
     private data_: ArrayBuffer
     private dataStorage_: GPUBuffer
@@ -310,9 +313,6 @@ class SceneSpriteLayerImpl implements ISceneSpriteLayer {
     private pipeline_: GPURenderPipeline
     private bindGroup_: GPUBindGroup
 
-    private modified_ = false
-    private itemsCount_ = 0
-    
     public constructor(
         private id_: TSceneLayerId<ISceneSpriteLayer>,
         private scene_: IScene,
