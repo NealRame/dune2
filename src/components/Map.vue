@@ -144,9 +144,9 @@ async function updateScene() {
     if (canvas.value == null) return
 
     const dune2MapConfig = {
-        ...dune2MapSizeConfig.value,
-        ...dune2MapTerrainConfig.value,
-        ...dune2MapSpiceConfig.value,
+        terrain: dune2MapTerrainConfig.value,
+        spice: dune2MapSpiceConfig.value,
+        size: dune2MapSizeConfig.value,
         seed: dune2MapSeed.value,
     }
 
