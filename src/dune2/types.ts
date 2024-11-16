@@ -54,24 +54,33 @@ export type TDune2TerrainNeighborhood = [
 export type TDune2MapGeneratorSizeConfig = TSize
 
 export type TDune2MapGeneratorTerrainOptions = {
-    terrainScale?: number,
-    terrainDetails?: number,
-    terrainSandThreshold?: number,       // clamped to [ 0, 1 ]
-    terrainRockThreshold?: number,       // clamped to [ 0, 1 ]
-    terrainMountainsThreshold?: number,  // clamped to [ 0, 1 ]
+    scale?: number
+    details?: number
+    sandThreshold?: number        // clamped to [ 0, 1 ]
+    rockThreshold?: number        // clamped to [ 0, 1 ]
+    mountainsThreshold?: number   // clamped to [ 0, 1 ]
 }
 
 export type TDune2MapGeneratorSpiceOptions = {
-    spiceScale?: number,
-    spiceDetails?: number,
-    spiceThreshold?: number,             // clamped to [ 0, 1 ]
-    spiceSaturationThreshold?: number    // clamped to [ 0, 1 ]
+    scale?: number
+    details?: number
+    threshold?: number            // clamped to [ 0, 1 ]
+    saturationThreshold?: number  // clamped to [ 0, 1 ]
 }
 
-export type TDune2MapGeneratorOptions =
-    TDune2MapGeneratorSizeConfig
-    & TDune2MapGeneratorTerrainOptions
-    & TDune2MapGeneratorSpiceOptions
-    & { seed?: number }
+export type TDune2MapGeneratorOptions = {
+    size: TDune2MapGeneratorSizeConfig
+    seed?: number
+    terrain?: TDune2MapGeneratorTerrainOptions
+    spice?: TDune2MapGeneratorSpiceOptions
+}
 
-export type TDune2MapGeneratorConfig = Required<TDune2MapGeneratorOptions>
+export type TDune2MapGeneratorTerrainConfig = Required<TDune2MapGeneratorTerrainOptions>
+export type TDune2MapGeneratorSpiceConfig = Required<TDune2MapGeneratorSpiceOptions>
+
+export type TDune2MapGeneratorConfig = {
+    size: TDune2MapGeneratorSizeConfig
+    seed: number
+    terrain: TDune2MapGeneratorTerrainConfig
+    spice: TDune2MapGeneratorSpiceConfig
+}
