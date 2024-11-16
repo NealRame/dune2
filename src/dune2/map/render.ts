@@ -1,5 +1,5 @@
 import {
-    type ISceneTilemapLayerHandler,
+    type ISceneTilemapLayer,
 } from "@nealrame/scene"
 
 import {
@@ -84,7 +84,7 @@ function renderSpice(
 
 export function render(
     this: Dune2Map,
-    layer: ISceneTilemapLayerHandler,
+    layer: ISceneTilemapLayer,
 ): Dune2Map {
     for (let y = 0; y < this.height; ++y) {
     for (let x = 0; x < this.width; ++x) {

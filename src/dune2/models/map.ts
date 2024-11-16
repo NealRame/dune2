@@ -44,40 +44,40 @@ export class Dune2MapSpiceConfigModel
         min: 8,
         max: 256,
         step: 1,
-    }) public spiceScale =
-        Dune2MapGeneratorConfigDefault.spiceScale
+    }) public scale =
+        Dune2MapGeneratorConfigDefault.spice.scale
 
     @range({
         label: "details",
         min: 1,
         max: 8,
         step: 1,
-    }) public spiceDetails =
-        Dune2MapGeneratorConfigDefault.spiceDetails
+    }) public details =
+        Dune2MapGeneratorConfigDefault.spice.details
     
     @range({
         label: "spice threshold",
         min: 0,
         max: 1,
         step: 0.01,
-    }) public spiceThreshold =
-        Dune2MapGeneratorConfigDefault.spiceThreshold
+    }) public threshold =
+        Dune2MapGeneratorConfigDefault.spice.threshold
 
     @range({
         label: "spice saturation threshold",
         min: 0,
         max: 1,
         step: 0.01,
-    }) public spiceSaturationThreshold =
-        Dune2MapGeneratorConfigDefault.spiceSaturationThreshold
+    }) public saturationThreshold =
+        Dune2MapGeneratorConfigDefault.spice.saturationThreshold
 
     public clone() {
         const config = new Dune2MapSpiceConfigModel()
 
-        config.spiceScale = this.spiceScale
-        config.spiceDetails = this.spiceDetails
-        config.spiceThreshold = this.spiceThreshold
-        config.spiceSaturationThreshold = this.spiceSaturationThreshold
+        config.scale = this.scale
+        config.details = this.details
+        config.threshold = this.threshold
+        config.saturationThreshold = this.saturationThreshold
 
         return config
     }
@@ -91,49 +91,49 @@ export class Dune2MapTerrainConfigModel
         min: 8,
         max: 256,
         step: 1,
-    }) public terrainScale =
-        Dune2MapGeneratorConfigDefault.terrainScale
+    }) public scale =
+        Dune2MapGeneratorConfigDefault.terrain.scale
 
     @range({
         label: "details",
         min: 1,
         max: 8,
         step: 1,
-    }) public terrainDetails =
-        Dune2MapGeneratorConfigDefault.terrainDetails
+    }) public details =
+        Dune2MapGeneratorConfigDefault.terrain.details
 
     @range({
         label: "sand threshold",
         min: 0,
         max: 1,
         step: 0.01,
-    }) public terrainSandThreshold =
-        Dune2MapGeneratorConfigDefault.terrainSandThreshold
+    }) public sandThreshold =
+        Dune2MapGeneratorConfigDefault.terrain.sandThreshold
 
     @range({
         label: "rock threshold",
         min: 0,
         max: 1,
         step: 0.01,
-    }) public terrainRockThreshold =
-        Dune2MapGeneratorConfigDefault.terrainRockThreshold
+    }) public rockThreshold =
+        Dune2MapGeneratorConfigDefault.terrain.rockThreshold
 
     @range({
         label: "moutain threshold",
         min: 0,
         max: 1,
         step: 0.01,
-    }) public terrainMountainsThreshold =
-        Dune2MapGeneratorConfigDefault.terrainMountainsThreshold
+    }) public mountainsThreshold =
+        Dune2MapGeneratorConfigDefault.terrain.mountainsThreshold
 
     public clone() {
         const config = new Dune2MapTerrainConfigModel()
 
-        config.terrainScale = this.terrainScale
-        config.terrainDetails = this.terrainDetails
-        config.terrainSandThreshold = this.terrainSandThreshold
-        config.terrainRockThreshold = this.terrainRockThreshold
-        config.terrainMountainsThreshold = this.terrainMountainsThreshold
+        config.scale = this.scale
+        config.details = this.details
+        config.sandThreshold = this.sandThreshold
+        config.rockThreshold = this.rockThreshold
+        config.mountainsThreshold = this.mountainsThreshold
 
         return config
     }

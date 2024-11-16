@@ -7,8 +7,7 @@ import {
 } from "@nealrame/maths"
 
 import {
-    ISceneTilemapLayerHandler,
-    type IScene,
+    type ISceneTilemapLayer,
 } from "@nealrame/scene"
 
 import {
@@ -25,38 +24,59 @@ import {
 
 
 export const Dune2MapGeneratorConfigDefault: TDune2MapGeneratorConfig = {
-    width: 16,
-    height: 16,
+    size: {
+        width: 16,
+        height: 16,
+    },
 
     seed: 0,
 
-    terrainScale: 32,
-    terrainDetails: 1,
-    terrainSandThreshold: 2/5,
-    terrainRockThreshold: 5/8,
-    terrainMountainsThreshold: 7/8,
+    terrain: {
+        scale: 32,
+        details: 1,
+        sandThreshold: 2/5,
+        rockThreshold: 5/8,
+        mountainsThreshold: 7/8,
+    },
 
-    spiceScale: 64,
-    spiceDetails: 6,
-    spiceThreshold: 6/10,
-    spiceSaturationThreshold: 8/10,
+    spice: {
+        scale: 64,
+        details: 6,
+        threshold: 6/10,
+        saturationThreshold: 8/10,
+    },
 }
 
 function ensureGeneratorConfig(
     options: TDune2MapGeneratorOptions,
 ): TDune2MapGeneratorConfig {
-    const config = {
-        ...Dune2MapGeneratorConfigDefault,
+    const config: TDune2MapGeneratorConfig  = {
+        size: { ...options.size },
         seed: Date.now(),
-        ...options,
+        terrain: { ...Dune2MapGeneratorConfigDefault.terrain },
+        spice: { ...Dune2MapGeneratorConfigDefault.spice },
     }
 
-    config.terrainSandThreshold = clamp(0, 1, config.terrainSandThreshold)
-    config.terrainRockThreshold = clamp(0, 1, config.terrainRockThreshold)
-    config.terrainMountainsThreshold = clamp(0, 1, config.terrainMountainsThreshold)
+    config.seed = options.seed ?? config.seed
 
-    config.spiceThreshold = clamp(0, 1, config.spiceThreshold)
-    config.spiceSaturationThreshold = clamp(0, 1, config.spiceSaturationThreshold)
+    if (options.terrain != null) {
+        config.terrain = {
+            ...config.terrain,
+            ...options.terrain,
+        }
+    }
+    config.terrain.sandThreshold = clamp(0, 1, config.terrain.sandThreshold)
+    config.terrain.rockThreshold = clamp(0, 1, config.terrain.rockThreshold)
+    config.terrain.mountainsThreshold = clamp(0, 1, config.terrain.mountainsThreshold)
+
+    if (options.spice != null) {
+        config.spice = {
+            ...config.spice,
+            ...options.spice,
+        }
+    }
+    config.spice.threshold = clamp(0, 1, config.spice.threshold)
+    config.spice.saturationThreshold = clamp(0, 1, config.spice.saturationThreshold)
 
     return config
 }
@@ -67,22 +87,22 @@ function terrainTypeGenerator(
     const map = createRangeMapper(-1, 1, 0, 1)
     const noise = createNoise2DGenerator({
         seed: config.seed,
-        scale: config.terrainScale,
-        octaves: config.terrainDetails,
+        scale: config.terrain.scale,
+        octaves: config.terrain.details,
     })
 
     return pos => {
         const v = map(noise(pos.x, pos.y))
 
-        if (v >= config.terrainMountainsThreshold) {
+        if (v >= config.terrain.mountainsThreshold) {
             return Dune2TerrainType.Mountain
         }
 
-        if (v >= config.terrainRockThreshold) {
+        if (v >= config.terrain.rockThreshold) {
             return Dune2TerrainType.Rock
         }
 
-        if (v >= config.terrainSandThreshold) {
+        if (v >= config.terrain.sandThreshold) {
             return Dune2TerrainType.Sand
         }
 
@@ -97,17 +117,17 @@ function spiceFieldGenerator(
     const map = createRangeMapper(-1, 1, 0, 1)
     const noise = createNoise2DGenerator({
         seed: config.seed + 1,
-        scale: config.spiceScale,
-        octaves: config.spiceDetails,
+        scale: config.spice.scale,
+        octaves: config.spice.details,
     })
 
     return pos => {
             const s = map(noise(pos.x, pos.y))
 
-            if (s >= config.spiceSaturationThreshold) {
+            if (s >= config.spice.saturationThreshold) {
                 return 1.0
             }
-            if (s >= config.spiceThreshold) {
+            if (s >= config.spice.threshold) {
                 return 0.5
             }
             return 0
@@ -125,8 +145,8 @@ export class Dune2Map {
 
         const terrains = []
 
-        for (let y = 0; y < generatorConfig.height; ++y) {
-        for (let x = 0; x < generatorConfig.width; ++x) {
+        for (let y = 0; y < generatorConfig.size.height; ++y) {
+        for (let x = 0; x < generatorConfig.size.width; ++x) {
             const pos = { x, y }
             const spice = spiceField(pos)
             const type = terrain(pos)
@@ -146,12 +166,12 @@ export class Dune2Map {
         }}
 
         return new Dune2Map({
-            width: generatorConfig.width,
-            height: generatorConfig.height,
+            width: generatorConfig.size.width,
+            height: generatorConfig.size.height,
         }, terrains)
     }
 
-    public render: (layer: ISceneTilemapLayerHandler) => Dune2Map
+    public render: (layer: ISceneTilemapLayer) => Dune2Map
 
     public constructor(
         private size_: TSize,
