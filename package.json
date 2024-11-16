@@ -33,7 +33,8 @@
     "vue-eslint-parser": "9.4.3",
     "vue-router": "4.4.5",
     "vue-tsc": "^2.1.4",
-    "wasm-pack": "^0.13.0"
+    "wasm-pack": "^0.13.0",
+    "zod": "^3.23.8"
   },
   "workspaces": [
     "packages/dune2-resources/packages/dune2/pkg",
