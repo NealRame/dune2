@@ -8,6 +8,7 @@ import {
     constant,
     flow,
     matches,
+    noop,
 } from "lodash"
 
 import {
@@ -42,10 +43,12 @@ import {
 } from "../composables"
 
 import {
+    type TDune2MapGeneratorConfig,
     Dune2Map,
     Dune2MapSizeConfigModel,
     Dune2MapSpiceConfigModel,
     Dune2MapTerrainConfigModel,
+    DuneMapGeneratorConfigSchema,
 } from "../dune2"
 
 import {
@@ -187,12 +190,31 @@ function scaleDown() {
 
 function copyToClipboard() {
     const text = JSON.stringify({
-        ...dune2MapSizeConfig.value,
-        ...dune2MapTerrainConfig.value,
-        ...dune2MapSpiceConfig.value,
+        size: {...dune2MapSizeConfig.value},
         seed: dune2MapSeed.value,
+        terrain: { ...dune2MapTerrainConfig.value },
+        spice: {...dune2MapSpiceConfig.value},
     }, null, "  ")
     navigator.clipboard.writeText(text)
+}
+
+async function drop(event: DragEvent) {
+    const file = event.dataTransfer?.files?.[0]
+
+    if (file != null) {
+        const content = await file.text()
+
+        try {
+            const config = DuneMapGeneratorConfigSchema.parse(JSON.parse(content))
+
+            dune2MapSeed.value = config.seed
+            dune2MapSizeConfig.value = Dune2MapSizeConfigModel.from(config.size)
+            dune2MapTerrainConfig.value = Dune2MapTerrainConfigModel.from(config.terrain)
+            dune2MapSpiceConfig.value = Dune2MapSpiceConfigModel.from(config.spice)
+        } catch (err) {
+            console.error(err)
+        }
+    }
 }
 
 watch([
@@ -253,7 +275,9 @@ useMouseZoom({
 <template>
     <canvas
         class="block w-full h-full"
-        oncontextmenu="return false"
+        @contextmenu.prevent.stop="noop"
+        @dragover.prevent.stop="noop"
+        @drop.prevent.stop="drop"
         ref="canvas"
     ></canvas>
     <div v-if="loading"

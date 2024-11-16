@@ -8,8 +8,8 @@ import {
 
 import type {
     TDune2MapGeneratorSizeConfig,
-    TDune2MapGeneratorSpiceOptions,
-    TDune2MapGeneratorTerrainOptions,
+    TDune2MapGeneratorSpiceConfig,
+    TDune2MapGeneratorTerrainConfig,
 } from "../types"
 
 
@@ -34,10 +34,21 @@ export class Dune2MapSizeConfigModel implements TDune2MapGeneratorSizeConfig {
 
         return size
     }
+
+    public static from(
+        config: TDune2MapGeneratorSizeConfig,
+    ): Dune2MapSizeConfigModel {
+        const newConfig = new Dune2MapSizeConfigModel()
+
+        newConfig.width = config.width
+        newConfig.height = config.height
+
+        return newConfig
+    }
 }
 
 export class Dune2MapSpiceConfigModel
-    implements Required<TDune2MapGeneratorSpiceOptions>
+    implements TDune2MapGeneratorSpiceConfig
 {
     @range({
         label: "scale",
@@ -81,11 +92,23 @@ export class Dune2MapSpiceConfigModel
 
         return config
     }
+
+    public static from(
+        config: TDune2MapGeneratorSpiceConfig,
+    ): Dune2MapSpiceConfigModel {
+        const newConfig = new Dune2MapSpiceConfigModel()
+
+        newConfig.scale = config.scale
+        newConfig.details = config.details
+        newConfig.threshold = config.threshold
+        newConfig.saturationThreshold = config.saturationThreshold
+        
+        return newConfig
+    }
 }
 
 export class Dune2MapTerrainConfigModel
-    implements Required<TDune2MapGeneratorTerrainOptions>
-{
+    implements TDune2MapGeneratorTerrainConfig {
     @range({
         label: "scale",
         min: 8,
@@ -136,5 +159,19 @@ export class Dune2MapTerrainConfigModel
         config.mountainsThreshold = this.mountainsThreshold
 
         return config
+    }
+    
+    public static from(
+        config: TDune2MapGeneratorTerrainConfig,
+    ): Dune2MapTerrainConfigModel {
+        const newConfig = new Dune2MapTerrainConfigModel()
+
+        newConfig.scale = config.scale
+        newConfig.details = config.details
+        newConfig.sandThreshold = config.sandThreshold
+        newConfig.rockThreshold = config.rockThreshold
+        newConfig.mountainsThreshold = config.mountainsThreshold
+        
+        return newConfig
     }
 }
