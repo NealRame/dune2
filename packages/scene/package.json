@@ -1,7 +1,7 @@
 {
   "name": "@nealrame/scene",
   "version": "0.0.1",
-  "description": "Scene renderer",
+  "description": "my scene renderer lib",
   "main": "lib/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
