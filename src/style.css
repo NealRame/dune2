@@ -27,3 +27,33 @@ body {
     width: 100%;
     height: 100%;
 }
+
+.action-btn {
+    @apply border border-gray-600;
+    @apply rounded w-6 h-6;
+    @apply hover:border-gray-400 hover:text-gray-400;
+    @apply active:bg-gray-300;
+}
+.action-btn-active {
+    @apply bg-gray-800 text-gray-300;
+    @apply border border-gray-700;
+    @apply rounded w-6 h-6;
+    @apply hover:border-gray-500 hover:text-gray-500;
+    @apply active:bg-gray-300;
+}
+
+.action-btn-inv {
+    @apply border border-gray-400;
+    @apply text-gray-200;
+    @apply rounded w-6 h-6;
+    @apply hover:border-gray-100 hover:text-gray-100;
+    @apply active:bg-gray-300 active:text-gray-500;
+}
+.action-btn-inv-active {
+    @apply bg-gray-500;
+    @apply border border-gray-400;
+    @apply text-gray-200;
+    @apply rounded w-6 h-6;
+    @apply hover:border-gray-100 hover:text-gray-100;
+    @apply active:bg-gray-300 active:text-gray-500;
+}

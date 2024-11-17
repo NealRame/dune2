@@ -42,7 +42,7 @@ watch([size, terrain, spice, seed], ([size, terrain, spice, seed]) => {
 </script>
 
 <template>
-<div class="backdrop-blur-sm bg-white/10 border flex flex-col gap-2 p-1">
+    <div class="backdrop-blur-sm bg-white/10 border flex flex-col gap-2 p-1">
         <section class="flex flex-col gap-2">
             <h1 class="bg-gray-100 text-center text-gray-500 uppercase"
             >Size</h1>

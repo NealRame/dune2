@@ -16,6 +16,7 @@ import {
 } from "pinia"
 
 import {
+    computed,
     ref,
     unref,
     watch,
@@ -79,6 +80,13 @@ const {
 
 const showSettings = ref(true)
 const showSettingsMode = ref<"form" | "json">("form")
+
+const view = computed(() => {
+    switch (unref(showSettingsMode)) {
+    case "form": return ConfigInspector
+    case "json": return ConfigJSON
+    }
+})
 
 const scale = ref(4)
 
@@ -268,38 +276,31 @@ useMouseZoom({
                 <h1 class="grow uppercase text-lg text-center">Map Generator</h1>
             </section>
 
-            <ConfigInspector
-                v-if="showSettingsMode === 'form'"
-                v-model="dune2MapGeneratorConfig"
-            />
-            <ConfigJSON
-                v-if="showSettingsMode === 'json'"
-                v-model="dune2MapGeneratorConfig"
-            />
+            <component :is="view" v-model="dune2MapGeneratorConfig"/>
 
             <section class="relative bg-white rounded-b-sm text-black p-1 flex gap-1">
                 <button
-                    class="hover:text-gray-700 active:text-gray-400"
+                    :class="showSettingsMode === 'form' ? 'action-btn-active' : 'action-btn'"
                     @click="showSettingsMode = 'form'"
                 ><i class="fa-solid fa-sliders"></i></button>
                 <button
-                    class="hover:text-gray-700 active:text-gray-400"
+                    :class="showSettingsMode === 'json' ? 'action-btn-active' : 'action-btn'"
                     @click="showSettingsMode = 'json'"
                 ><i class="fa-solid fa-code"></i></button>
             </section>
         </div>
         <div class="flex flex-col-reverse gap-1">
             <button
-                class="border rounded w-8 h-8"
+                class="action-btn-inv"
                 @click="scaleUp"
             ><i class="fa-solid fa-magnifying-glass-plus"></i></button>
             <button
-                class="border rounded w-8 h-8"
+                class="action-btn-inv"
                 @click="scaleDown"
             ><i class="fa-solid fa-magnifying-glass-minus"></i></button>
             <button
-                class="border rounded w-8 h-8"
-                :class="showSettings ? ['bg-white text-black'] : []"
+                class="action-btn-inv"
+                :class="showSettings ? 'action-btn-inv-active' : 'action-btn-inv'"
                 @click="showSettings = !showSettings"
             ><i class="fa-solid fa-gear"></i></button>
         </div>

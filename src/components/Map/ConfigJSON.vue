@@ -31,16 +31,16 @@ watch(source, source => {
 </script>
 
 <template>
-<div class="backdrop-blur-sm bg-white/30 relative border p-2">
-    <button
-        class="border rounded absolute w-6 h-6 top-2 right-2 hover:text-gray-700 active:text-gray-400"
-        @click="copyToClipboard"
-    ><i class="fa-solid fa-copy"></i></button>
-    <textarea
-        class="bg-transparent outline-none font-mono text-xs resize-none"
-        cols="40"
-        rows="24"
-        v-model="source"
-    ></textarea>
-</div>
+    <div class="backdrop-blur-sm border bg-white/10 relative p-2">
+        <button
+            class="action-btn-inv absolute top-2 right-2"
+            @click="copyToClipboard"
+        ><i class="fa-solid fa-copy"></i></button>
+        <textarea
+            class="bg-transparent outline-none font-mono text-xs resize-none"
+            cols="40"
+            rows="24"
+            v-model="source"
+        ></textarea>
+    </div>
 </template>
