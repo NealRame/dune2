@@ -1,6 +1,6 @@
 import {
     range,
-} from "../../decorators"
+} from "@nealrame/decorators"
 
 import {
     Dune2MapGeneratorConfigDefault,

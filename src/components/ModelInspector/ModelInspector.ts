@@ -8,7 +8,7 @@ import {
     getModelMetadata,
     isChoiceFieldConfig,
     isRangeFieldConfig,
-} from "../../decorators"
+} from "@nealrame/decorators"
 
 import ChoiceField from "./ChoiceField"
 import RangeField from "./RangeField"
