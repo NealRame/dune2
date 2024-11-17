@@ -11,7 +11,8 @@ import {
 import {
     type TDune2MapGeneratorConfig,
     Dune2MapGeneratorConfigSchema,
-} from "../../dune2"
+} from "@nealrame/dune2"
+
 
 const config = defineModel<TDune2MapGeneratorConfig>({ required: true })
 const source = ref(JSON.stringify(config.value, null, "  "))

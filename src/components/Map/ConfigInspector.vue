@@ -9,15 +9,15 @@ import {
 } from "vue"
 
 import {
-    ModelInspector,
-} from "../ModelInspector"
-
-import {
     type TDune2MapGeneratorConfig,
     Dune2MapSizeConfigModel,
     Dune2MapSpiceConfigModel,
     Dune2MapTerrainConfigModel,
-} from "../../dune2"
+} from "@nealrame/dune2"
+
+import {
+    ModelInspector,
+} from "../ModelInspector"
 
 
 const config = defineModel<TDune2MapGeneratorConfig>({ required: true })

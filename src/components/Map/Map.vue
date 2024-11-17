@@ -23,6 +23,15 @@ import {
 } from "vue"
 
 import {
+    type TDune2MapGeneratorConfig,
+    Dune2Map,
+    Dune2MapSizeConfigModel,
+    Dune2MapSpiceConfigModel,
+    Dune2MapTerrainConfigModel,
+    Dune2MapGeneratorConfigSchema,
+} from "@nealrame/dune2"
+
+import {
     type TPoint,
     type TSize,
     Rect,
@@ -42,15 +51,6 @@ import {
     useMouseZoom,
     useResize,
 } from "../../composables"
-
-import {
-    type TDune2MapGeneratorConfig,
-    Dune2Map,
-    Dune2MapSizeConfigModel,
-    Dune2MapSpiceConfigModel,
-    Dune2MapTerrainConfigModel,
-    Dune2MapGeneratorConfigSchema,
-} from "../../dune2"
 
 import {
     useDune2GameResources,

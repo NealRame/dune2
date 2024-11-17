@@ -1,5 +1,4 @@
 .DS_Store
-.env
 
 lerna-debug.log*
 
@@ -9,6 +8,5 @@ pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-data
-dist
 node_modules
+lib/dune2_data.rc

@@ -9,7 +9,7 @@ import {
 import {
     type TDune2GameResources,
     loadDune2Resources,
-} from "../dune2"
+} from "@nealrame/dune2"
 
 
 export const useDune2GameResources = defineStore("Dune2GameResources", () => {

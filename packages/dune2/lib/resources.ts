@@ -12,7 +12,7 @@ import type {
     TDune2TextureMapping,
 } from "./types"
 
-import Dune2ResourcesURL from "./data.rc"
+import Dune2ResourcesURL from "./dune2_data.rc"
 
 
 const TextureTilesPerRow = 16

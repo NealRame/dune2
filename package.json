@@ -40,6 +40,7 @@
     "packages/dune2-resources/packages/dune2/pkg",
     "packages/maths",
     "packages/scene",
-    "packages/decorators"
+    "packages/decorators",
+    "packages/dune2"
   ]
 }
