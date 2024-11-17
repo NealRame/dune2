@@ -55,7 +55,8 @@ import {
     useDune2GameResources,
 } from "../../stores"
 
-import Inspector from "./Inspector.vue"
+import ConfigInspector from "./ConfigInspector.vue"
+import ConfigJSON from "./ConfigJSON.vue"
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 
@@ -77,6 +78,8 @@ const {
 } = storeToRefs(useDune2GameResources())
 
 const showSettings = ref(true)
+const showSettingsMode = ref<"form" | "json">("form")
+
 const scale = ref(4)
 
 const dune2MapGeneratorConfig = ref<TDune2MapGeneratorConfig>({
@@ -178,11 +181,6 @@ function scaleDown() {
     scale.value = clamp(1, 4, scale.value - 1)
 }
 
-function copyToClipboard() {
-    const text = JSON.stringify(dune2MapGeneratorConfig.value, null, "  ")
-    navigator.clipboard.writeText(text)
-}
-
 async function drop(event: DragEvent) {
     const file = event.dataTransfer?.files?.[0]
 
@@ -264,17 +262,31 @@ useMouseZoom({
         class="absolute bottom-4 right-4 flex gap-1"
     >
         <div v-if="showSettings"
-            class="border rounded flex flex-col gap-2 p-1 text-sm"
+            class="border rounded flex-auto flex flex-col gap-1 p-1 text-sm"
         >
             <section class="relative bg-white rounded-t-sm text-black p-1">
                 <h1 class="grow uppercase text-lg text-center">Map Generator</h1>
-                <button
-                    class="absolute top-1/2 right-1 -translate-y-1/2 hover:text-gray-700 active:text-gray-400"
-                    @click="copyToClipboard"
-                ><i class="fa-solid fa-copy"></i></button>
             </section>
 
-            <Inspector v-model="dune2MapGeneratorConfig"/>
+            <ConfigInspector
+                v-if="showSettingsMode === 'form'"
+                v-model="dune2MapGeneratorConfig"
+            />
+            <ConfigJSON
+                v-if="showSettingsMode === 'json'"
+                v-model="dune2MapGeneratorConfig"
+            />
+
+            <section class="relative bg-white rounded-b-sm text-black p-1 flex gap-1">
+                <button
+                    class="hover:text-gray-700 active:text-gray-400"
+                    @click="showSettingsMode = 'form'"
+                ><i class="fa-solid fa-sliders"></i></button>
+                <button
+                    class="hover:text-gray-700 active:text-gray-400"
+                    @click="showSettingsMode = 'json'"
+                ><i class="fa-solid fa-code"></i></button>
+            </section>
         </div>
         <div class="flex flex-col-reverse gap-1">
             <button
