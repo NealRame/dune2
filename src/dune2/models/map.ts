@@ -35,6 +35,10 @@ export class Dune2MapSizeConfigModel implements TDune2MapGeneratorSizeConfig {
         return size
     }
 
+    public static get default(): Dune2MapSizeConfigModel {
+        return new Dune2MapSizeConfigModel()
+    }
+    
     public static from(
         config: TDune2MapGeneratorSizeConfig,
     ): Dune2MapSizeConfigModel {
@@ -91,6 +95,10 @@ export class Dune2MapSpiceConfigModel
         config.saturationThreshold = this.saturationThreshold
 
         return config
+    }
+
+    public static get default(): Dune2MapSpiceConfigModel {
+        return new Dune2MapSpiceConfigModel()
     }
 
     public static from(
@@ -159,6 +167,10 @@ export class Dune2MapTerrainConfigModel
         config.mountainsThreshold = this.mountainsThreshold
 
         return config
+    }
+
+    public static get default(): Dune2MapTerrainConfigModel {
+        return new Dune2MapTerrainConfigModel()
     }
     
     public static from(

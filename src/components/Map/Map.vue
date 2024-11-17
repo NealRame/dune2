@@ -40,24 +40,22 @@ import {
     useMouseGrab,
     useMouseZoom,
     useResize,
-} from "../composables"
+} from "../../composables"
 
 import {
+    type TDune2MapGeneratorConfig,
     Dune2Map,
     Dune2MapSizeConfigModel,
     Dune2MapSpiceConfigModel,
     Dune2MapTerrainConfigModel,
     Dune2MapGeneratorConfigSchema,
-} from "../dune2"
+} from "../../dune2"
 
 import {
     useDune2GameResources,
-} from "../stores"
+} from "../../stores"
 
-import {
-    ModelInspector,
-} from "./ModelInspector"
-
+import Inspector from "./Inspector.vue"
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 
@@ -81,10 +79,12 @@ const {
 const showSettings = ref(true)
 const scale = ref(4)
 
-const dune2MapSizeConfig = ref(new Dune2MapSizeConfigModel())
-const dune2MapTerrainConfig = ref(new Dune2MapTerrainConfigModel())
-const dune2MapSpiceConfig = ref(new Dune2MapSpiceConfigModel())
-const dune2MapSeed = ref(0)
+const dune2MapGeneratorConfig = ref<TDune2MapGeneratorConfig>({
+    size: Dune2MapSizeConfigModel.default,
+    terrain: Dune2MapTerrainConfigModel.default,
+    spice: Dune2MapSpiceConfigModel.default,
+    seed: 0,
+})
 
 let scene: IScene | null = null
 let sceneViewportOrigin: TPoint | null = null
@@ -145,12 +145,7 @@ async function updateScene() {
     if (dune2GameResources.value == null) return
     if (canvas.value == null) return
 
-    const dune2MapConfig = {
-        terrain: dune2MapTerrainConfig.value,
-        spice: dune2MapSpiceConfig.value,
-        size: dune2MapSizeConfig.value,
-        seed: dune2MapSeed.value,
-    }
+    const dune2MapConfig = dune2MapGeneratorConfig.value
 
     const [
         textureTileSize,
@@ -159,7 +154,7 @@ async function updateScene() {
 
     scene = await Scene.create(
         {...textureTileSize},
-        {...dune2MapSizeConfig.value},
+        dune2MapConfig.size,
         canvas.value,
     )
 
@@ -175,10 +170,6 @@ async function updateScene() {
     updateViewportSize()
 }
 
-function randSeed() {
-    dune2MapSeed.value = Math.floor(Math.random()*Number.MAX_SAFE_INTEGER)
-}
-
 function scaleUp() {
     scale.value = clamp(1, 4, scale.value + 1)
 }
@@ -188,12 +179,7 @@ function scaleDown() {
 }
 
 function copyToClipboard() {
-    const text = JSON.stringify({
-        size: {...dune2MapSizeConfig.value},
-        seed: dune2MapSeed.value,
-        terrain: { ...dune2MapTerrainConfig.value },
-        spice: {...dune2MapSpiceConfig.value},
-    }, null, "  ")
+    const text = JSON.stringify(dune2MapGeneratorConfig.value, null, "  ")
     navigator.clipboard.writeText(text)
 }
 
@@ -206,22 +192,14 @@ async function drop(event: DragEvent) {
         try {
             const config = Dune2MapGeneratorConfigSchema.parse(JSON.parse(content))
 
-            dune2MapSeed.value = config.seed
-            dune2MapSizeConfig.value = Dune2MapSizeConfigModel.from(config.size)
-            dune2MapTerrainConfig.value = Dune2MapTerrainConfigModel.from(config.terrain)
-            dune2MapSpiceConfig.value = Dune2MapSpiceConfigModel.from(config.spice)
+            dune2MapGeneratorConfig.value = config
         } catch (err) {
             console.error(err)
         }
     }
 }
 
-watch([
-    dune2MapSizeConfig,
-    dune2MapTerrainConfig,
-    dune2MapSpiceConfig,
-    dune2MapSeed,
-], updateScene)
+watch(dune2MapGeneratorConfig, updateScene)
 
 watch(keyDown, flow(
     cond([
@@ -296,41 +274,7 @@ useMouseZoom({
                 ><i class="fa-solid fa-copy"></i></button>
             </section>
 
-            <section class="flex flex-col gap-2">
-                <h1 class="bg-gray-100 text-center text-gray-500 uppercase"
-                >Size</h1>
-                <ModelInspector v-model="dune2MapSizeConfig"/>
-            </section>
-
-            <section class="flex flex-col gap-2">
-                <h1 class="bg-gray-100 text-center text-gray-500 uppercase"
-                >Terrain</h1>
-                <ModelInspector v-model="dune2MapTerrainConfig"/>
-            </section>
-
-            <section class="flex flex-col gap-2">
-                <h1 class="bg-gray-100 text-center text-gray-500 uppercase"
-                >Spice</h1>
-                <ModelInspector v-model="dune2MapSpiceConfig"/>
-            </section>
-
-            <section class="flex flex-col gap-2">
-                <h1 class="bg-gray-100 text-center text-gray-500 uppercase"
-                >Seed</h1>
-                <div class="flex gap-1">
-                    <label for="seed-value">value</label>
-                    <input
-                        class="grow outline-none px-1 rounded text-black text-center"
-                        id="seed-value"
-                        type="number"
-                        v-model="dune2MapSeed">
-                    <button
-                        class="border rounded col-span-2 px-2"
-                        @click="randSeed">
-                        <i class="fa-solid fa-shuffle"></i>
-                    </button>
-                </div>
-            </section>
+            <Inspector v-model="dune2MapGeneratorConfig"/>
         </div>
         <div class="flex flex-col-reverse gap-1">
             <button

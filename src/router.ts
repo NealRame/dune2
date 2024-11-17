@@ -6,7 +6,7 @@ import {
 
 import Home from "./components/Home.vue"
 import Tilesets from "./components/Tilesets.vue"
-import Map from "./components/Map.vue"
+import Map from "./components/Map"
 import Noise from "./components/Noise.vue"
 
 const routes: Array<RouteRecordRaw> = [{
