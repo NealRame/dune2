@@ -50,37 +50,3 @@ export type TDune2TerrainNeighborhood = [
     TDune2Terrain | null,
     TDune2Terrain | null,
 ]
-
-export type TDune2MapGeneratorSizeConfig = TSize
-
-export type TDune2MapGeneratorTerrainOptions = {
-    scale?: number
-    details?: number
-    sandThreshold?: number        // clamped to [ 0, 1 ]
-    rockThreshold?: number        // clamped to [ 0, 1 ]
-    mountainsThreshold?: number   // clamped to [ 0, 1 ]
-}
-
-export type TDune2MapGeneratorSpiceOptions = {
-    scale?: number
-    details?: number
-    threshold?: number            // clamped to [ 0, 1 ]
-    saturationThreshold?: number  // clamped to [ 0, 1 ]
-}
-
-export type TDune2MapGeneratorOptions = {
-    size: TDune2MapGeneratorSizeConfig
-    seed?: number
-    terrain?: TDune2MapGeneratorTerrainOptions
-    spice?: TDune2MapGeneratorSpiceOptions
-}
-
-export type TDune2MapGeneratorTerrainConfig = Required<TDune2MapGeneratorTerrainOptions>
-export type TDune2MapGeneratorSpiceConfig = Required<TDune2MapGeneratorSpiceOptions>
-
-export type TDune2MapGeneratorConfig = {
-    size: TDune2MapGeneratorSizeConfig
-    seed: number
-    terrain: TDune2MapGeneratorTerrainConfig
-    spice: TDune2MapGeneratorSpiceConfig
-}

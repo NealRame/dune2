@@ -43,12 +43,11 @@ import {
 } from "../composables"
 
 import {
-    type TDune2MapGeneratorConfig,
     Dune2Map,
     Dune2MapSizeConfigModel,
     Dune2MapSpiceConfigModel,
     Dune2MapTerrainConfigModel,
-    DuneMapGeneratorConfigSchema,
+    Dune2MapGeneratorConfigSchema,
 } from "../dune2"
 
 import {
@@ -205,7 +204,7 @@ async function drop(event: DragEvent) {
         const content = await file.text()
 
         try {
-            const config = DuneMapGeneratorConfigSchema.parse(JSON.parse(content))
+            const config = Dune2MapGeneratorConfigSchema.parse(JSON.parse(content))
 
             dune2MapSeed.value = config.seed
             dune2MapSizeConfig.value = Dune2MapSizeConfigModel.from(config.size)

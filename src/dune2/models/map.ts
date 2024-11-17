@@ -10,7 +10,7 @@ import type {
     TDune2MapGeneratorSizeConfig,
     TDune2MapGeneratorSpiceConfig,
     TDune2MapGeneratorTerrainConfig,
-} from "../types"
+} from "../schema"
 
 
 export class Dune2MapSizeConfigModel implements TDune2MapGeneratorSizeConfig {
