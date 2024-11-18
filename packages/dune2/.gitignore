@@ -9,4 +9,4 @@ yarn-debug.log*
 yarn-error.log*
 
 node_modules
-lib/dune2_data.rc
+lib/resources/dune2_data.rc

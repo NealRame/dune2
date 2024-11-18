@@ -10,7 +10,7 @@ import {
 import type {
     TDune2GameResources,
     TDune2TextureMapping,
-} from "./types"
+} from "../types"
 
 import Dune2ResourcesURL from "./dune2_data.rc"
 
