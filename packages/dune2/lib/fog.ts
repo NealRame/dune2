@@ -4,9 +4,8 @@ import {
 } from "@nealrame/maths"
 
 import {
-    type ISceneTilemapLayerHandler,
+    type ISceneTilemapLayer,
 } from "@nealrame/scene"
-
 
 
 export class Dune2FogOfWar {
@@ -48,17 +47,16 @@ export class Dune2FogOfWar {
         return this
     }
 
-    public render(layer: ISceneTilemapLayerHandler): this {
+    public render(layer: ISceneTilemapLayer): this {
         for (let y = 0; y < this.height; ++y) {
         for (let x = 0; x < this.width; ++x) {
-            const pos = {x, y}
+            const position = {x, y}
+            const textureIndex = 
+                this.isRevealed(position)
+                    ? -1
+                    : this.getFogTileIndex_(position)
 
-            if (this.isRevealed(pos)) {
-                layer.set(pos, -1)
-            } else {
-                const fogTileIndex = this.getFogTileIndex_(pos)
-                layer.set(pos, fogTileIndex)
-            }
+            layer.set({ position, textureIndex })
         }}
         return this
     }
