@@ -23,12 +23,7 @@ import {
     useResize,
 } from "../composables"
 
-import {
-    useDune2GameResources,
-} from "../stores"
 
-
-const store = useDune2GameResources()
 const canvas = ref<HTMLCanvasElement | null>(null)
 
 const noiseConfig = reactive<TNoiseConfig>({
@@ -89,10 +84,7 @@ watch(size, resize)
 
 <template>
     <canvas class="block w-full h-full" ref="canvas"></canvas>
-    <div v-if="store.loading"
-        class="absolute left-0 top-0 w-full h-full z-10"
-    >Loading...</div>
-    <div v-else
+    <div
         class="border rounded absolute bottom-4 right-4 p-1 grid grid-cols-2 gap-1 items-center"
     >
         <label for="type">Type</label>

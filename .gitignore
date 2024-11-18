@@ -9,6 +9,6 @@ pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-data
-dist
-node_modules
+/data
+/dist
+/node_modules

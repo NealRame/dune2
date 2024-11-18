@@ -22,5 +22,5 @@ pushd "$DUNE2_DATA_DIR"
     "$DUNE2_RC_TOOLKIT" \
         create "$DUNE2_RESOURCES_DIR/dune2.rc.toml" \
             --force-overwrite \
-            --output-file "$SOURCES_DIR/packages/dune2/lib/resources/dune2_data.rc"
+            --output-file "$SOURCES_DIR/packages/dune2/lib/assets/dune2_assets.rc"
 popd

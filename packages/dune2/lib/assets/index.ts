@@ -8,11 +8,11 @@ import {
 } from "@nealrame/maths"
 
 import type {
-    TDune2GameResources,
+    TDune2GameData,
     TDune2TextureMapping,
 } from "../types"
 
-import Dune2ResourcesURL from "./dune2_data.rc"
+import Dune2ResourcesURL from "./dune2_assets.rc"
 
 
 const TextureTilesPerRow = 16
@@ -87,7 +87,7 @@ async function generateTextures(
     )
 }
 
-export async function loadDune2Resources(): Promise<TDune2GameResources> {
+export async function loadDune2Assets(): Promise<TDune2GameData> {
     const res = await fetch(Dune2ResourcesURL)
     const data = await res.arrayBuffer()
     const resources = Dune2Resources.load(new Uint8Array(data))

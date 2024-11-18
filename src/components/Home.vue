@@ -8,10 +8,10 @@ import {
 } from "pinia"
 
 import {
-    useDune2GameResources,
+    useDune2GameAssets,
 } from "../stores"
 
-const { loading, error } = storeToRefs(useDune2GameResources())
+const { loading, error } = storeToRefs(useDune2GameAssets())
 
 const menuStyle = [
     "flex",

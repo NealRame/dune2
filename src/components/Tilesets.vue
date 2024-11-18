@@ -19,12 +19,12 @@ import {
 } from "../composables"
 
 import {
-    useDune2GameResources,
+    useDune2GameAssets,
 } from "../stores"
 
 
 const canvas = ref<HTMLCanvasElement | null>(null)
-const store = useDune2GameResources()
+const store = useDune2GameAssets()
 const currentTileset = ref<string|null>(null)
 
 const { devicePixelSize: size } = useResize(canvas)
@@ -40,7 +40,7 @@ function resize(size: TSize) {
 
 async function selectTileset(tilesetId: string) {
     const context = unref(canvas)?.getContext("2d")
-    const texture = store.dune2GameResources?.textures[tilesetId]
+    const texture = store.dune2GameAssets?.textures[tilesetId]
 
     if (texture != null && context != null) {
         const [_, image] = texture
@@ -66,8 +66,8 @@ watch(size, resize)
 
 <template>
     <canvas class="block w-full h-full" ref="canvas"></canvas>
-    <ul v-if="store.dune2GameResources" class="absolute top-1 left-1">
-        <li v-for="(_,tilesetId) in store.dune2GameResources.textures"
+    <ul v-if="store.dune2GameAssets" class="absolute top-1 left-1">
+        <li v-for="(_,tilesetId) in store.dune2GameAssets.textures"
             class="px-2"
             :class="currentTileset === tilesetId ? ['text-red-600', 'font-bold'] : []"
             :key="tilesetId"

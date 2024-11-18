@@ -53,7 +53,7 @@ import {
 } from "../../composables"
 
 import {
-    useDune2GameResources,
+    useDune2GameAssets,
 } from "../../stores"
 
 import ConfigInspector from "./ConfigInspector.vue"
@@ -74,9 +74,9 @@ const { keyDown } = useKeyboard(ev => {
 })
 
 const {
-    dune2GameResources,
+    dune2GameAssets,
     loading,
-} = storeToRefs(useDune2GameResources())
+} = storeToRefs(useDune2GameAssets())
 
 const showSettings = ref(true)
 const showSettingsMode = ref<"form" | "json">("form")
@@ -153,7 +153,7 @@ function updateViewportSize() {
 }
 
 async function updateScene() {
-    if (dune2GameResources.value == null) return
+    if (dune2GameAssets.value == null) return
     if (canvas.value == null) return
 
     const dune2MapConfig = dune2MapGeneratorConfig.value
@@ -161,7 +161,7 @@ async function updateScene() {
     const [
         textureTileSize,
         textureImage,
-    ] = dune2GameResources.value.textures["terrain"]
+    ] = dune2GameAssets.value.textures["terrain"]
 
     scene = await Scene.create(
         {...textureTileSize},
@@ -223,7 +223,7 @@ watch(keyDown, flow(
 ))
 
 watch(
-    [canvas, dune2GameResources],
+    [canvas, dune2GameAssets],
     async ([canvas, dune2GameResources]) => {
         if (canvas == null) return
         if (dune2GameResources == null) return
