@@ -41,5 +41,5 @@ export const Dune2MapGeneratorOptionsSchema = z.object({
     terrain: Dune2MapGeneratorTerrainConfigSchema.partial().optional(),
     spice: Dune2MapGeneratorSpiceConfigSchema.partial().optional(),
 })
-export type TDune2MapGeneratorOptionsConfig =
+export type TDune2MapGeneratorOptions =
     z.infer<typeof Dune2MapGeneratorOptionsSchema>

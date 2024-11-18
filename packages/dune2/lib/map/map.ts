@@ -15,8 +15,11 @@ import {
 } from "./render"
 
 import {
-    type TDune2MapGeneratorOptions,
     type TDune2MapGeneratorConfig,
+    type TDune2MapGeneratorOptions,
+} from "../schema"
+
+import {
     type TDune2Terrain,
     type TDune2TerrainNeighborhood,
     Dune2TerrainType,
@@ -81,36 +84,6 @@ function ensureGeneratorConfig(
     return config
 }
 
-function terrainTypeGenerator(
-    config: TDune2MapGeneratorConfig
-): (pos: TPoint) => Dune2TerrainType {
-    const map = createRangeMapper(-1, 1, 0, 1)
-    const noise = createNoise2DGenerator({
-        seed: config.seed,
-        scale: config.terrain.scale,
-        octaves: config.terrain.details,
-    })
-
-    return pos => {
-        const v = map(noise(pos.x, pos.y))
-
-        if (v >= config.terrain.mountainsThreshold) {
-            return Dune2TerrainType.Mountain
-        }
-
-        if (v >= config.terrain.rockThreshold) {
-            return Dune2TerrainType.Rock
-        }
-
-        if (v >= config.terrain.sandThreshold) {
-            return Dune2TerrainType.Sand
-        }
-
-        return Dune2TerrainType.Dunes
-    }
-}
-
-
 function spiceFieldGenerator(
     config: TDune2MapGeneratorConfig
 ): (pos: TPoint) => number {
@@ -134,28 +107,58 @@ function spiceFieldGenerator(
     }
 }
 
+function terrainTypeGenerator(
+    config: TDune2MapGeneratorConfig
+): (pos: TPoint, spice: number) => Dune2TerrainType {
+    const map = createRangeMapper(-1, 1, 0, 1)
+    const noise = createNoise2DGenerator({
+        seed: config.seed,
+        scale: config.terrain.scale,
+        octaves: config.terrain.details,
+    })
+
+    return (pos, spice) => {
+        const v = map(noise(pos.x, pos.y))
+
+        if (v >= config.terrain.mountainsThreshold) {
+            return Dune2TerrainType.Mountain
+        }
+
+        if (v >= config.terrain.rockThreshold) {
+            return Dune2TerrainType.Rock
+        }
+
+        if (spice > 0) {
+            return Dune2TerrainType.Spice
+        }
+
+        if (v >= config.terrain.sandThreshold) {
+            return Dune2TerrainType.Sand
+        }
+
+        return Dune2TerrainType.Dunes
+    }
+}
+
 export class Dune2Map {
     public static generate(
         options: TDune2MapGeneratorOptions,
     ): Dune2Map {
         const generatorConfig = ensureGeneratorConfig(options)
 
-        const terrain = terrainTypeGenerator(generatorConfig)
         const spiceField = spiceFieldGenerator(generatorConfig)
-
-        const terrains = []
+        const terrainType = terrainTypeGenerator(generatorConfig)
+        const terrains: Array<TDune2Terrain> = []
 
         for (let y = 0; y < generatorConfig.size.height; ++y) {
         for (let x = 0; x < generatorConfig.size.width; ++x) {
             const pos = { x, y }
             const spice = spiceField(pos)
-            const type = terrain(pos)
+            const type = terrainType(pos, spice)
 
-            if ((type == Dune2TerrainType.Dunes || type == Dune2TerrainType.Sand)
-                && spice > 0
-            ) {
+            if (type === Dune2TerrainType.Spice) {
                 terrains.push({
-                    type: Dune2TerrainType.Spice,
+                    type,
                     spice,
                 })
             } else {
@@ -165,10 +168,7 @@ export class Dune2Map {
             }
         }}
 
-        return new Dune2Map({
-            width: generatorConfig.size.width,
-            height: generatorConfig.size.height,
-        }, terrains)
+        return new Dune2Map({ ...generatorConfig.size }, terrains)
     }
 
     public render: (layer: ISceneTilemapLayer) => Dune2Map
