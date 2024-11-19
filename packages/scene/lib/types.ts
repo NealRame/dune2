@@ -73,6 +73,8 @@ export interface IScene {
     getLayer<T extends ISceneLayer>(layerId: TSceneLayerId<T>): T | null
     delLayer<T extends ISceneLayer>(layerId: TSceneLayerId<T>): this
 
+    clear(): this
+    
     start(tickCallback?: TSceneTickCallback): this
     stop(): this
 

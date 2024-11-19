@@ -539,6 +539,16 @@ export class Scene implements IScene {
         return this.textureFormat_
     }
 
+    public clear(): this {
+        for (const layer of this.layers_.values()) {
+            layer.dataStorage.destroy()
+            layer.uniforms.destroy()
+            layer.texture.destroy()
+        }
+        this.layers_.clear()
+        return this
+    }
+
     public addLayer<T extends ISceneLayer>(
         layerReq: TSceneLayerReq<T>,
         config: TSceneLayerConfig,
