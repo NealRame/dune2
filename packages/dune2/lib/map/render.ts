@@ -10,7 +10,7 @@ import {
     type TDune2Terrain,
     type TDune2TerrainNeighborhood,
     Dune2TerrainType,
-} from "../types"
+} from "./terrain"
 
 
 function isDunes(t: TDune2Terrain | null): boolean {
@@ -94,32 +94,34 @@ export function render(
 
         let textureIndex = -1
 
-        switch (terrain.type) {
-        case Dune2TerrainType.Sand:
-            textureIndex = 0
-            break
+        if (terrain != null) {
+            switch (terrain.type) {
+            case Dune2TerrainType.Sand:
+                textureIndex = 0
+                break
 
-        case Dune2TerrainType.Spice:
-            textureIndex = renderSpice(terrain.spice, neighborhood)
-            break
+            case Dune2TerrainType.Spice:
+                textureIndex = renderSpice(terrain.spice, neighborhood)
+                break
 
-        case Dune2TerrainType.Dunes:
-            textureIndex = renderDunes(neighborhood)
-            break
+            case Dune2TerrainType.Dunes:
+                textureIndex = renderDunes(neighborhood)
+                break
 
-        case Dune2TerrainType.Mountain:
-            textureIndex = renderMountain(neighborhood)
-            break
+            case Dune2TerrainType.Mountain:
+                textureIndex = renderMountain(neighborhood)
+                break
+    
+            case Dune2TerrainType.Rock:
+                textureIndex = renderRock(neighborhood)
+                break
 
-        case Dune2TerrainType.Rock:
-            textureIndex = renderRock(neighborhood)
-            break
+            default:
+                break
+            }
 
-        default:
-            break
+            layer.set({ position, textureIndex })
         }
-        
-        layer.set({ position, textureIndex })
     }}
 
     return this
