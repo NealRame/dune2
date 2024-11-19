@@ -179,7 +179,7 @@ async function updateScene() {
         textureTileSize,
     })
 
-    const dune2Map = Dune2Map.generate(dune2MapConfig)
+    const dune2Map = await Dune2Map.create(dune2MapConfig)
 
     dune2Map.render(layer!)
     updateViewportSize()

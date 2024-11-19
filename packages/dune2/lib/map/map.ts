@@ -141,9 +141,9 @@ function terrainTypeGenerator(
 }
 
 export class Dune2Map {
-    public static generate(
+    public static async create(
         options: TDune2MapGeneratorOptions,
-    ): Dune2Map {
+    ): Promise<Dune2Map> {
         const generatorConfig = ensureGeneratorConfig(options)
 
         const spiceField = spiceFieldGenerator(generatorConfig)
@@ -168,7 +168,10 @@ export class Dune2Map {
             }
         }}
 
-        return new Dune2Map({ ...generatorConfig.size }, terrains)
+        return Promise.resolve(new Dune2Map(
+            { ...generatorConfig.size },
+            terrains),
+        )
     }
 
     public render: (layer: ISceneTilemapLayer) => Dune2Map

@@ -36,8 +36,8 @@ export type TDune2MapGeneratorConfig =
     z.infer<typeof Dune2MapGeneratorConfigSchema>
 
 export const Dune2MapGeneratorOptionsSchema = z.object({
-    seed: z.number(),
     size: Dune2MapGeneratorSizeConfigSchema,
+    seed: z.number().optional(),
     terrain: Dune2MapGeneratorTerrainConfigSchema.partial().optional(),
     spice: Dune2MapGeneratorSpiceConfigSchema.partial().optional(),
 })
