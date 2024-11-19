@@ -25,9 +25,6 @@ import {
 import {
     type TDune2MapGeneratorConfig,
     Dune2Map,
-    Dune2MapSizeConfigModel,
-    Dune2MapSpiceConfigModel,
-    Dune2MapTerrainConfigModel,
     Dune2MapGeneratorConfigSchema,
 } from "@nealrame/dune2"
 
@@ -56,8 +53,15 @@ import {
     useDune2GameAssets,
 } from "../../stores"
 
+import {
+    Dune2MapSizeConfigModel,
+    Dune2MapSpiceConfigModel,
+    Dune2MapTerrainConfigModel,
+} from "./models"
+
 import ConfigInspector from "./ConfigInspector.vue"
 import ConfigJSON from "./ConfigJSON.vue"
+
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 

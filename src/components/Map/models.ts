@@ -3,17 +3,16 @@ import {
 } from "@nealrame/decorators"
 
 import {
+    type TDune2MapGeneratorSizeConfig,
+    type TDune2MapGeneratorSpiceConfig,
+    type TDune2MapGeneratorTerrainConfig,
     Dune2MapGeneratorConfigDefault,
-} from "../map"
-
-import type {
-    TDune2MapGeneratorSizeConfig,
-    TDune2MapGeneratorSpiceConfig,
-    TDune2MapGeneratorTerrainConfig,
-} from "../schema"
+} from "@nealrame/dune2"
 
 
-export class Dune2MapSizeConfigModel implements TDune2MapGeneratorSizeConfig {
+export class Dune2MapSizeConfigModel
+    implements TDune2MapGeneratorSizeConfig
+{
     @range({
         min: 1,
         max: 256,
@@ -116,7 +115,8 @@ export class Dune2MapSpiceConfigModel
 }
 
 export class Dune2MapTerrainConfigModel
-    implements TDune2MapGeneratorTerrainConfig {
+    implements TDune2MapGeneratorTerrainConfig
+{
     @range({
         label: "scale",
         min: 8,

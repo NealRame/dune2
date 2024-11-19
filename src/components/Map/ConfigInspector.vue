@@ -10,10 +10,14 @@ import {
 
 import {
     type TDune2MapGeneratorConfig,
+
+} from "@nealrame/dune2"
+
+import {
     Dune2MapSizeConfigModel,
     Dune2MapSpiceConfigModel,
     Dune2MapTerrainConfigModel,
-} from "@nealrame/dune2"
+} from "./models"
 
 import {
     ModelInspector,

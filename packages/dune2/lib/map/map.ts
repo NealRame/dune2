@@ -17,7 +17,7 @@ import {
 import {
     type TDune2MapGeneratorConfig,
     type TDune2MapGeneratorOptions,
-} from "../schema"
+} from "./schema"
 
 import {
     type TDune2Terrain,
