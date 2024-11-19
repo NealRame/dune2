@@ -14,14 +14,14 @@ import {
 } from "@nealrame/dune2"
 
 import {
+    ModelInspector,
+} from "../ModelInspector"
+
+import {
     Dune2MapSizeConfigModel,
     Dune2MapSpiceConfigModel,
     Dune2MapTerrainConfigModel,
 } from "./models"
-
-import {
-    ModelInspector,
-} from "../ModelInspector"
 
 
 const config = defineModel<TDune2MapGeneratorConfig>({ required: true })
