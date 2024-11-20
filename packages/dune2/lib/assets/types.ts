@@ -4,6 +4,6 @@ import {
 
 export type TDune2TextureMapping = Record<string, [TSize, ImageBitmap]>
 
-export type TDune2GameData = {
+export type TDune2GameAssets = {
     textures: TDune2TextureMapping
 }

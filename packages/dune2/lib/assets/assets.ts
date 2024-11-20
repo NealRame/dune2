@@ -8,7 +8,7 @@ import {
 } from "@nealrame/maths"
 
 import type {
-    TDune2GameData,
+    TDune2GameAssets,
     TDune2TextureMapping,
 } from "./types"
 
@@ -87,7 +87,7 @@ async function generateTextures(
     )
 }
 
-export async function loadDune2Assets(): Promise<TDune2GameData> {
+export async function loadDune2Assets(): Promise<TDune2GameAssets> {
     const res = await fetch(Dune2ResourcesURL)
     const data = await res.arrayBuffer()
     const resources = Dune2Resources.load(new Uint8Array(data))
