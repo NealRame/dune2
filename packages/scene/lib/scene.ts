@@ -96,7 +96,8 @@ function createLayerUniforms(
     } = config
     const { width, height } = texture.tileSize
 
-    const values = new ArrayBuffer(8)
+
+    const values = new ArrayBuffer(16)
     const buffer = scene.device.createBuffer({
         label: `layer ${name} - input uniforms`,
         size: values.byteLength,
@@ -105,9 +106,11 @@ function createLayerUniforms(
 
     const views = {
         textureTileSize: new Float32Array(values),
+        textureTilePerRow: new Uint32Array(values, 8, 1),
     }
 
     views.textureTileSize.set([width, height])
+    views.textureTilePerRow.set([texture.tilesPerRow])
     scene.device.queue.writeBuffer(buffer, 0, values)
     return buffer
 }

@@ -11,6 +11,7 @@ struct SceneInputs {
 
 struct LayerInputs {
     texture_tile_size: vec2f,
+    texture_tile_per_row: i32,
 };
 
 struct VSOutput {
@@ -53,12 +54,13 @@ fn texture_coordinates(
     instance_index: u32,
 ) -> vec2f {
     let tex_tile_size = layer_inputs.texture_tile_size;
+    let tex_tiles_per_row = layer_inputs.texture_tile_per_row;
     let tex_size = vec2f(textureDimensions(layer_texture));
     let tex_index = layer_data[instance_index];
 
     var tex_xy = vec2f(vec2<i32>(
-        tex_index%16,
-        tex_index/16,
+        tex_index%tex_tiles_per_row,
+        tex_index/tex_tiles_per_row,
     ));
     tex_xy += (position + 1)/2;   // cell corner coordinates
     tex_xy *= tex_tile_size;      // >-> [0..tex_size]
