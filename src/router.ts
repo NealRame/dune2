@@ -7,7 +7,6 @@ import {
 import Home from "./components/Home.vue"
 import Tilesets from "./components/Tilesets.vue"
 import Map from "./components/Map"
-import Noise from "./components/Noise.vue"
 
 const routes: Array<RouteRecordRaw> = [{
     path: "/",
@@ -21,10 +20,6 @@ const routes: Array<RouteRecordRaw> = [{
     path: "/tilesets",
     name: "tilesets",
     component: Tilesets,
-}, {
-    path: "/noise-editor",
-    name: "noise-editor",
-    component: Noise,
 }]
 
 const router = createRouter({

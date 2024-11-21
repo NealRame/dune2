@@ -50,13 +50,6 @@ const menuStyle = [
                             name: 'tilesets',
                         }"
                     >Tilesets</RouterLink>
-                </li><li>
-                    <RouterLink
-                        class="hover:text-red-600 transition-colors duration-300"
-                        :to="{
-                            name: 'noise-editor',
-                        }"
-                    >Noise Editor</RouterLink>
                 </li>
             </ul>
         </div>
