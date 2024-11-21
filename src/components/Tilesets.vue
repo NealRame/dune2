@@ -43,19 +43,19 @@ async function selectTileset(tilesetId: string) {
     const texture = store.dune2GameAssets?.textures[tilesetId]
 
     if (texture != null && context != null) {
-        const [_, image] = texture
+        const { surface } = texture
         const {
             width: screenWidth,
             height: screenHeight,
         } = context.canvas
 
-        const x = (screenWidth - image.width)/2
-        const y = (screenHeight - image.height)/2
+        const x = (screenWidth - surface.width)/2
+        const y = (screenHeight - surface.height)/2
 
         context.clearRect(0, 0, screenWidth, screenHeight)
         context.fillStyle = "#f0f"
-        context.fillRect(x, y, image.width, image.height)
-        context.drawImage(image, x, y)
+        context.fillRect(x, y, surface.width, surface.height)
+        context.drawImage(surface, x, y)
     }
 
     currentTileset.value = tilesetId
