@@ -162,21 +162,17 @@ async function updateScene() {
 
     const dune2MapConfig = dune2MapGeneratorConfig.value
 
-    const [
-        textureTileSize,
-        textureImage,
-    ] = dune2GameAssets.value.textures["terrain"]
+    const texture = dune2GameAssets.value.textures["terrain"]
 
     scene = await Scene.create(
-        {...textureTileSize},
+        {...texture.tileSize},
         dune2MapConfig.size,
         canvas.value,
     )
 
     const layer = scene.addLayer(SceneTilemapLayer, {
         name: "land",
-        textureImage,
-        textureTileSize,
+        texture,
     })
 
     const dune2Map = await Dune2Map.create(dune2MapConfig)

@@ -5,6 +5,12 @@ import {
 } from "@nealrame/maths"
 
 
+export type TSceneLayerTexture = {
+    surface: ImageBitmap,
+    tileSize: TSize,
+    tilesPerRow: number,
+}
+
 export type TSceneLayerItem = {
     position: TPoint
     textureIndex: number
@@ -49,8 +55,7 @@ export type TSceneLayerReq<T extends ISceneLayer = ISceneLayer> = symbol & IScen
 
 export type TSceneLayerConfig = {
     name: string
-    textureImage: ImageBitmap
-    textureTileSize: TSize
+    texture: TSceneLayerTexture
 }
 
 export interface IScene {

@@ -3,9 +3,13 @@ import {
     Dune2Faction,
 } from "@nealrame/dune2-rc"
 
-import {
-    type TSize,
+import type {
+    TSize,
 } from "@nealrame/maths"
+
+import type {
+    TSceneLayerTexture,
+} from "@nealrame/scene"
 
 import type {
     TDune2GameAssets,
@@ -20,7 +24,7 @@ const TextureTilesPerRow = 16
 async function generateTilesetFactionsTexture(
     resources: Dune2Resources,
     tileset: string,
-): Promise<[string, TDune2TextureMapping[string]]> {
+): Promise<[string, TSceneLayerTexture]> {
     const rcTileCount = resources.getTilesetTileCount(tileset)
     const rcTileSize = resources.getTilesetTileSize(tileset)
 
@@ -50,17 +54,23 @@ async function generateTilesetFactionsTexture(
         textureContext.putImageData(imageData, 0, yOffset)
     }
 
-    return [tileset, [tileSize, await createImageBitmap(texture)]]
+    const surface = await createImageBitmap(texture)
+
+    return [tileset, {
+        surface,
+        tileSize,
+        tilesPerRow: TextureTilesPerRow,
+    }]
 }
 
 async function generateTilesetTexture(
     resources: Dune2Resources,
     tileset: string,
-): Promise<[string, [TSize, ImageBitmap]]> {
+): Promise<[string, TSceneLayerTexture]> {
     const rcTileSize = resources.getTilesetTileSize(tileset)
     const imageData = resources.getTilesetImageData(tileset, TextureTilesPerRow)
 
-    const image = await createImageBitmap(imageData)
+    const surface = await createImageBitmap(imageData)
     const tileSize: TSize = {
         width: rcTileSize.width,
         height: rcTileSize.height,
@@ -68,7 +78,11 @@ async function generateTilesetTexture(
 
     rcTileSize.free()
 
-    return [tileset, [tileSize, image]]
+    return [tileset, {
+        surface,
+        tileSize,
+        tilesPerRow: TextureTilesPerRow,
+    }]
 }
 
 async function generateTextures(

@@ -68,13 +68,9 @@ function createLayerTexture(
     scene: IScene,
     config: TSceneLayerConfig,
 ): GPUTexture {
-    const {
-        name,
-        textureImage,
-    } = config
-    const { width, height } = textureImage
+    const { width, height } = config.texture.surface
     const texture = scene.device.createTexture({
-        label: `layer ${name} - texture`,
+        label: `layer ${config.name} - texture`,
         size: [width, height],
         format: "rgba8unorm",
         usage: GPUTextureUsage.TEXTURE_BINDING
@@ -83,7 +79,7 @@ function createLayerTexture(
     })
 
     scene.device.queue.copyExternalImageToTexture(
-        { source: textureImage },
+        { source: config.texture.surface },
         { texture },
         { width, height },
     )
@@ -96,9 +92,9 @@ function createLayerUniforms(
 ): GPUBuffer {
     const {
         name,
-        textureTileSize,
+        texture,
     } = config
-    const { width, height } = textureTileSize
+    const { width, height } = texture.tileSize
 
     const values = new ArrayBuffer(8)
     const buffer = scene.device.createBuffer({
