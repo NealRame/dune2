@@ -19,7 +19,7 @@ import type {
 import Dune2ResourcesURL from "./dune2_assets.rc"
 
 
-const TextureTilesPerRow = 16
+const TEXTURE_TILES_PER_ROW = 16
 
 async function generateTilesetFactionsTexture(
     resources: Dune2Resources,
@@ -28,7 +28,7 @@ async function generateTilesetFactionsTexture(
     const rcTileCount = resources.getTilesetTileCount(tileset)
     const rcTileSize = resources.getTilesetTileSize(tileset)
 
-    const columns = TextureTilesPerRow
+    const columns = TEXTURE_TILES_PER_ROW
     const rows = Math.ceil(rcTileCount/columns)
     const tileSize: TSize = {
         width: rcTileSize.width,
@@ -59,7 +59,7 @@ async function generateTilesetFactionsTexture(
     return [tileset, {
         surface,
         tileSize,
-        tilesPerRow: TextureTilesPerRow,
+        tilesPerRow: TEXTURE_TILES_PER_ROW,
     }]
 }
 
@@ -68,7 +68,7 @@ async function generateTilesetTexture(
     tileset: string,
 ): Promise<[string, TSceneLayerTexture]> {
     const rcTileSize = resources.getTilesetTileSize(tileset)
-    const imageData = resources.getTilesetImageData(tileset, TextureTilesPerRow)
+    const imageData = resources.getTilesetImageData(tileset, TEXTURE_TILES_PER_ROW)
 
     const surface = await createImageBitmap(imageData)
     const tileSize: TSize = {
@@ -81,7 +81,7 @@ async function generateTilesetTexture(
     return [tileset, {
         surface,
         tileSize,
-        tilesPerRow: TextureTilesPerRow,
+        tilesPerRow: TEXTURE_TILES_PER_ROW,
     }]
 }
 
