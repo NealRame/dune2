@@ -7,10 +7,14 @@ import {
     type ISceneTilemapLayer,
 } from "@nealrame/scene"
 
+import {
+    posToIndex,
+} from "../utils"
 
 export class Dune2FogOfWar {
     private fog_: Array<boolean> = []
-
+    private modified_: boolean = true
+    
     private getFogTileIndex_(
         {x, y}: TPoint,
     ): number {
@@ -33,17 +37,25 @@ export class Dune2FogOfWar {
     public get height() { return this.size_.height }
     public get width()  { return this.size_.width }
 
-    public isRevealed({x, y}: TPoint): boolean {
-        if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
-            return this.fog_[y*this.size_.width + x]
-        }
-        return false
+    public get hasChanged() { return this.modified_ }
+
+    public isRevealed(position: TPoint): boolean {
+        const index = posToIndex(position, this.size_)
+        
+        return index != null
+            ? this.fog_[index]
+            : false
     }
 
-    public reveal({ x, y }: TPoint): this {
-        if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
-            this.fog_[y*this.width + x] = true
+    public reveal(position: TPoint): this {
+        const index = posToIndex(position, this.size_)
+        
+        if (index != null) {
+            if (this.fog_[index]) {
+                this.modified_ = this.fog_[index] = true
+            }
         }
+
         return this
     }
 
@@ -58,6 +70,7 @@ export class Dune2FogOfWar {
 
             layer.set({ position, textureIndex })
         }}
+        this.modified_ = false
         return this
     }
 }
