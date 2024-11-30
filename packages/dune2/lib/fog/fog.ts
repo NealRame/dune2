@@ -47,11 +47,9 @@ export class Dune2FogOfWar {
 
     public reveal(position: TPoint): this {
         const index = posToIndex(position, this.size_)
-        
-        if (index != null) {
-            if (!this.fog_[index]) {
-                this.modified_ = this.fog_[index] = true
-            }
+
+        if (!(index == null || this.fog_[index])) {
+            this.modified_ = this.fog_[index] = true
         }
 
         return this
