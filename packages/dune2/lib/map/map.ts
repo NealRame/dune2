@@ -229,6 +229,7 @@ export class Dune2Map {
                 layer.set({ position, textureIndex })
             }
         }}
+        this.modified_ = false
         return this
     }
 }
