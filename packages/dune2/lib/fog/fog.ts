@@ -49,7 +49,7 @@ export class Dune2FogOfWar {
         const index = posToIndex(position, this.size_)
         
         if (index != null) {
-            if (this.fog_[index]) {
+            if (!this.fog_[index]) {
                 this.modified_ = this.fog_[index] = true
             }
         }
