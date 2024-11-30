@@ -26,6 +26,7 @@ import {
     type TDune2MapGeneratorConfig,
     Dune2Map,
     Dune2MapGeneratorConfigSchema,
+    Dune2MapGenerator,
 } from "@nealrame/dune2"
 
 import {
@@ -175,7 +176,8 @@ async function updateScene() {
         texture,
     })
 
-    const dune2Map = await Dune2Map.create(dune2MapConfig)
+    const dune2MapGenerator = new Dune2MapGenerator()
+    const dune2Map = await dune2MapGenerator.generate(dune2MapConfig)
 
     dune2Map.render(layer!)
     updateViewportSize()
