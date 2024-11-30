@@ -50,7 +50,7 @@ export class Dune2FogGenerator {
 
         for (let y = rowFirst; y <= rowLast; ++y) {
             for (let x = colFirst; x <= colLast; ++x) {
-                fog.reveal({ x, y })
+                fog.revealAt({ x, y })
             }
         }
         

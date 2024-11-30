@@ -18,10 +18,10 @@ export class Dune2FogOfWar {
     private getFogTileIndex_(
         {x, y}: TPoint,
     ): number {
-        const north = this.isRevealed({ x, y: y - 1 }) ? 0 : 1
-        const east  = this.isRevealed({ x: x + 1, y }) ? 0 : 1
-        const south = this.isRevealed({ x, y: y + 1 }) ? 0 : 1
-        const west  = this.isRevealed({ x: x - 1, y }) ? 0 : 1
+        const north = this.isRevealedAt({ x, y: y - 1 }) ? 0 : 1
+        const east  = this.isRevealedAt({ x: x + 1, y }) ? 0 : 1
+        const south = this.isRevealedAt({ x, y: y + 1 }) ? 0 : 1
+        const west  = this.isRevealedAt({ x: x - 1, y }) ? 0 : 1
 
         return north | (east << 1) | (south << 2) | (west << 3)
     }
@@ -37,7 +37,7 @@ export class Dune2FogOfWar {
     public get height() { return this.size_.height }
     public get width()  { return this.size_.width }
 
-    public isRevealed(position: TPoint): boolean {
+    public isRevealedAt(position: TPoint): boolean {
         const index = posToIndex(position, this.size_)
         
         return index != null
@@ -45,7 +45,7 @@ export class Dune2FogOfWar {
             : false
     }
 
-    public reveal(position: TPoint): this {
+    public revealAt(position: TPoint): this {
         const index = posToIndex(position, this.size_)
 
         if (!(index == null || this.fog_[index])) {
@@ -64,7 +64,7 @@ export class Dune2FogOfWar {
         for (let x = 0; x < this.width; ++x) {
             const position = {x, y}
             const textureIndex = 
-                this.isRevealed(position)
+                this.isRevealedAt(position)
                     ? -1
                     : this.getFogTileIndex_(position)
 
