@@ -37,8 +37,6 @@ export class Dune2FogOfWar {
     public get height() { return this.size_.height }
     public get width()  { return this.size_.width }
 
-    public get hasChanged() { return this.modified_ }
-
     public isRevealed(position: TPoint): boolean {
         const index = posToIndex(position, this.size_)
         
@@ -60,6 +58,10 @@ export class Dune2FogOfWar {
     }
 
     public render(layer: ISceneTilemapLayer): this {
+        if (!this.modified_) return this
+
+        this.modified_ = false
+
         for (let y = 0; y < this.height; ++y) {
         for (let x = 0; x < this.width; ++x) {
             const position = {x, y}
@@ -70,7 +72,7 @@ export class Dune2FogOfWar {
 
             layer.set({ position, textureIndex })
         }}
-        this.modified_ = false
+
         return this
     }
 }

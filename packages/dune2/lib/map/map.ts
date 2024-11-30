@@ -188,10 +188,14 @@ export class Dune2Map {
 
     public get height() { return this.size_.height }
     public get width()  { return this.size_.width }
-    
+
     public render(
         layer: ISceneTilemapLayer,
     ): Dune2Map {
+        if (!this.modified_) return this
+
+        this.modified_ = false
+
         for (let y = 0; y < this.height; ++y) {
         for (let x = 0; x < this.width; ++x) {
             const position = { x, y }
@@ -199,7 +203,7 @@ export class Dune2Map {
             const neighborhood = this.neighborhoodAt(position, terrain)
     
             let textureIndex = -1
-    
+
             if (terrain != null) {
                 switch (terrain.type) {
                 case Dune2TerrainType.Sand:
@@ -229,7 +233,7 @@ export class Dune2Map {
                 layer.set({ position, textureIndex })
             }
         }}
-        this.modified_ = false
+
         return this
     }
 }
