@@ -9,4 +9,4 @@ yarn-debug.log*
 yarn-error.log*
 
 node_modules
-lib/assets/dune2_assets.rc
+lib/assets/dune2_assets.bin

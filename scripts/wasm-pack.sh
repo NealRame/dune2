@@ -12,7 +12,7 @@ export SOURCES_DIR="${SOURCES_DIR:-$PWD}"
 source "$SOURCES_DIR/scripts/env.sh"
 
 # Build wasm package
-pushd "$DUNE2_RESOURCES_DIR"
+pushd "$DUNE2_ASSETS_DIR"
     "$SOURCES_DIR/node_modules/.bin/wasm-pack" \
         build packages/dune2 \
             --release \

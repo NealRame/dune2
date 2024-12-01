@@ -12,7 +12,7 @@ export SOURCES_DIR="${SOURCES_DIR:-$PWD}"
 source "$SOURCES_DIR/scripts/env.sh"
 
 # Build dune2-unpak tools
-pushd "$DUNE2_RESOURCES_DIR"
+pushd "$DUNE2_ASSETS_DIR"
     cargo build --package dune2-unpak --release
     export DUNE2_UNPAK="$PWD/target/release/dune2-unpak"
 popd
