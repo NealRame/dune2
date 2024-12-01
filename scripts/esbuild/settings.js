@@ -19,7 +19,7 @@ export default function (options) {
             "src/style.css",
         ],
         loader: {
-            ".rc": "file",
+            ".bin": "file",
             ".wgsl": "text",
         },
         outdir: "dist",

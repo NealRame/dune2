@@ -37,7 +37,7 @@
     "zod": "^3.23.8"
   },
   "workspaces": [
-    "packages/dune2-resources/packages/dune2/pkg",
+    "packages/dune2-assets/packages/dune2/pkg",
     "packages/maths",
     "packages/scene",
     "packages/decorators",

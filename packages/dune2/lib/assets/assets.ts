@@ -1,7 +1,7 @@
 import {
-    Dune2Resources,
+    Dune2AssetsData,
     Dune2Faction,
-} from "@nealrame/dune2-rc"
+} from "@nealrame/dune2-assets"
 
 import type {
     TSize,
@@ -16,17 +16,17 @@ import type {
     TDune2TextureMapping,
 } from "./types"
 
-import Dune2ResourcesURL from "./dune2_assets.rc"
+import Dune2ResourcesURL from "./dune2_assets.bin"
 
 
 const TEXTURE_TILES_PER_ROW = 16
 
 async function generateTilesetFactionsTexture(
-    resources: Dune2Resources,
+    assetsData: Dune2AssetsData,
     tileset: string,
 ): Promise<[string, TSceneLayerTexture]> {
-    const rcTileCount = resources.getTilesetTileCount(tileset)
-    const rcTileSize = resources.getTilesetTileSize(tileset)
+    const rcTileCount = assetsData.getTilesetTileCount(tileset)
+    const rcTileSize = assetsData.getTilesetTileSize(tileset)
 
     const columns = TEXTURE_TILES_PER_ROW
     const rows = Math.ceil(rcTileCount/columns)
@@ -45,7 +45,7 @@ async function generateTilesetFactionsTexture(
 
     for (let faction = 0; faction < Dune2Faction.Count; ++faction) {
         const yOffset = faction*rows*tileSize.height
-        const imageData = resources.getTilesetImageData(
+        const imageData = assetsData.getTilesetImageData(
             tileset,
             columns,
             faction,
@@ -64,11 +64,11 @@ async function generateTilesetFactionsTexture(
 }
 
 async function generateTilesetTexture(
-    resources: Dune2Resources,
+    assetsData: Dune2AssetsData,
     tileset: string,
 ): Promise<[string, TSceneLayerTexture]> {
-    const rcTileSize = resources.getTilesetTileSize(tileset)
-    const imageData = resources.getTilesetImageData(tileset, TEXTURE_TILES_PER_ROW)
+    const rcTileSize = assetsData.getTilesetTileSize(tileset)
+    const imageData = assetsData.getTilesetImageData(tileset, TEXTURE_TILES_PER_ROW)
 
     const surface = await createImageBitmap(imageData)
     const tileSize: TSize = {
@@ -86,15 +86,15 @@ async function generateTilesetTexture(
 }
 
 async function generateTextures(
-    resources: Dune2Resources,
+    assetsData: Dune2AssetsData,
 ): Promise<TDune2TextureMapping> {
     return Object.fromEntries(
-        await Promise.all(resources.getTilesets().map(
+        await Promise.all(assetsData.getTilesets().map(
             async tileset => {
                 if (tileset == "fog" || tileset == "terrain") {
-                    return generateTilesetTexture(resources, tileset)
+                    return generateTilesetTexture(assetsData, tileset)
                 } else {
-                    return generateTilesetFactionsTexture(resources, tileset)
+                    return generateTilesetFactionsTexture(assetsData, tileset)
                 }
             }
         ))
@@ -104,9 +104,9 @@ async function generateTextures(
 export async function loadDune2Assets(): Promise<TDune2GameAssets> {
     const res = await fetch(Dune2ResourcesURL)
     const data = await res.arrayBuffer()
-    const resources = Dune2Resources.load(new Uint8Array(data))
+    const assetsData = Dune2AssetsData.load(new Uint8Array(data))
 
-    const textures = await generateTextures(resources)
+    const textures = await generateTextures(assetsData)
 
     return {
         textures
