@@ -1,7 +1,3 @@
-import {
-    type TSize,
-} from "@nealrame/maths"
-
 import { 
     type TSceneLayerTexture,
 } from "@nealrame/scene"
